@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "MovieReservationApp/lib/mysql-connector-j-9.1.0.jar"
+        "MovieReservationApp/lib/mysql-connector-j-9.1.0.jar",
+        "MovieReservationApp/lib/junit-platform-console-standalone-1.11.3.jar"
     ]
 }
