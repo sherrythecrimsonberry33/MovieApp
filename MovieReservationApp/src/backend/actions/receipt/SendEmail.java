@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 public class SendEmail {
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String SENDER_EMAIL = "acmeplex@theater.com";
-    private static final String SENDER_PASSWORD = "your_app_specific_password";
+    private static final String SENDER_EMAIL = "alexxcarter92@gmail.com";
+    private static final String SENDER_PASSWORD = "kcaoagymqzbuplkb";
 
     public void sendTicketAndReceipt(String recipientEmail, TicketInfo ticketInfo, GenerateReceipt receipt) 
             throws MessagingException {
@@ -52,7 +52,7 @@ public class SendEmail {
         html.append("<h2>Your Movie Tickets</h2>");
         html.append("<p>Ticket ID: ").append(ticketInfo.getTicketId()).append("</p>");
         html.append("<p>Movie: ").append(ticketInfo.getMovieName()).append("</p>");
-        html.append("<p>Theater: ").append(ticketInfo.getMovieHallName()).append("</p>");
+        html.append("<p>Movie Hall: ").append(ticketInfo.getMovieHallName()).append("</p>");
         html.append("<p>Show Time: ").append(ticketInfo.getShowTiming()).append("</p>");
         html.append("<p>Seats: ").append(String.join(", ", ticketInfo.getSeats().stream()
                 .map(seat -> seat.getSeatLabel())
