@@ -3,6 +3,8 @@
         "lib/**/*.jar",
         "MovieReservationApp/lib/mysql-connector-j-9.1.0.jar",
         "MovieReservationApp/lib/junit-platform-console-standalone-1.11.3.jar",
-        "MovieReservationApp/lib/javax.mail.jar"
+        "MovieReservationApp/lib/javax.mail.jar",
+        "MovieReservationApp/lib/jakarta.activation-1.2.2.jar",
+        "MovieReservationApp/lib/javax.activation-api-1.2.0.jar"
     ]
 }
