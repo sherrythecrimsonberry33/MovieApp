@@ -72,9 +72,9 @@ package frontend;
 import java.awt.*;
 import java.net.URL;
 import java.sql.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.imageio.ImageIO;
 
 public class MovieTheaterMainPage extends JFrame {
     private JTable movieTable;
@@ -82,8 +82,8 @@ public class MovieTheaterMainPage extends JFrame {
     private JPanel posterPanel;
 
     // Database credentials
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/MovieTheater";
-    private static final String DB_USER = "root";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/MovieTheater"; 
+    private static final String DB_USER = "movieadmin";
     private static final String DB_PASSWORD = "password";
 
     public MovieTheaterMainPage() {
@@ -98,15 +98,15 @@ public class MovieTheaterMainPage extends JFrame {
         // Create poster panel
         posterPanel = new JPanel();
         posterPanel.setPreferredSize(new Dimension(300, 400));
-        loadTestPoster(); // Load test poster
 
         // Create Table Model
-        tableModel = new DefaultTableModel(new String[]{"ID", "Title", "Genre", "Duration (min)", "Rating"}, 0) {
+        tableModel = new DefaultTableModel(new String[]{"ID", "Title", "Genre", "Duration (min)", "Rating", "Poster URL"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Make table read-only
             }
         };
+        
         movieTable = new JTable(tableModel);
         movieTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -115,11 +115,13 @@ public class MovieTheaterMainPage extends JFrame {
             if (!e.getValueIsAdjusting()) {
                 int selectedRow = movieTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    // In real implementation, you would get poster URL from database
-                    loadTestPoster();
+                    String posterUrl = (String) tableModel.getValueAt(selectedRow, 5); // Assuming Poster URL is column 5
+                    loadPoster(posterUrl);
                 }
             }
         });
+        
+        
 
         // Layout
         mainContent.add(new JScrollPane(movieTable), BorderLayout.CENTER);
@@ -136,54 +138,57 @@ public class MovieTheaterMainPage extends JFrame {
         loadMovies();
     }
 
-    private void loadTestPoster() {
+    private void loadPoster(String posterUrl) {
         posterPanel.removeAll();
         try {
-            // Use the provided image URL
-            URL imageUrl = new URL("https://i.ibb.co/bvdqphn/conclave.jpg");
+            // Use URI to handle poster URL
+            URL imageUrl = new java.net.URI(posterUrl).toURL();
             Image image = ImageIO.read(imageUrl);
-            
-            // Scale image to fit panel while maintaining aspect ratio
-            int targetWidth = 280;
-            int targetHeight = 380;
-            
-            Image scaledImage = image.getScaledInstance(targetWidth, -1, Image.SCALE_SMOOTH);
+    
+            // Scale the image to fit the panel
+            Image scaledImage = image.getScaledInstance(280, -1, Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(scaledImage);
-            
+    
             JLabel imageLabel = new JLabel(imageIcon);
             imageLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            
+    
             posterPanel.add(imageLabel);
             posterPanel.revalidate();
             posterPanel.repaint();
-            
         } catch (Exception e) {
             JLabel errorLabel = new JLabel("Could not load poster");
             posterPanel.add(errorLabel);
             e.printStackTrace();
         }
     }
+    
+    
+    
+    
 
     private void loadMovies() {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT * FROM movies";
+            String query = "SELECT id, title, genre, duration, rating, poster_url FROM movies";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-
+    
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
                 String genre = rs.getString("genre");
                 int duration = rs.getInt("duration");
                 double rating = rs.getDouble("rating");
-
-                tableModel.addRow(new Object[]{id, title, genre, duration, rating});
+                String posterUrl = rs.getString("poster_url");
+    
+                tableModel.addRow(new Object[]{id, title, genre, duration, rating, posterUrl});
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading movies: " + e.getMessage(),
                     "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
