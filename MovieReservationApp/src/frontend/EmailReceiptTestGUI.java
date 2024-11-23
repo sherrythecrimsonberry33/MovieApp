@@ -383,11 +383,13 @@ package frontend;
 
 
 import javax.swing.*;
+
+import backend.Entity.*;
+import backend.Entity.receipt.*;
+
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import backend.actions.*;
-import backend.actions.receipt.*;
 
 public class EmailReceiptTestGUI extends JFrame {
     private JTextField emailField;

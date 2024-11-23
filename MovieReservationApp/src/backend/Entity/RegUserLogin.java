@@ -1,4 +1,4 @@
-package backend.actions;
+package backend.Entity;
 
 public class RegUserLogin {
     

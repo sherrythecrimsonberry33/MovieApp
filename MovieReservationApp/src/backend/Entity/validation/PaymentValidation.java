@@ -1,4 +1,4 @@
-package backend.actions.validation;
+package backend.Entity.validation;
 
 public class PaymentValidation {
     

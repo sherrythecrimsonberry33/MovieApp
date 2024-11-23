@@ -1,11 +1,12 @@
-package backend.actions.receipt;
+package backend.Entity.receipt;
 
-import backend.actions.TicketInfo;
-import backend.actions.TheatreInfo;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import backend.Entity.TheatreInfo;
+import backend.Entity.TicketInfo;
 
 public class GenerateReceipt {
     private final String receiptId;

@@ -1,9 +1,11 @@
-package backend.actions.receipt;
+package backend.Entity.receipt;
 
-import backend.actions.TicketInfo;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import backend.Entity.TicketInfo;
+
 import java.util.stream.Collectors;
 
 public class SendEmail {

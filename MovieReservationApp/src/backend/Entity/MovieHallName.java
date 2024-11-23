@@ -1,4 +1,4 @@
-package backend.actions;
+package backend.Entity;
 
 public enum MovieHallName {
     IMAX_SUPREME("IMAX Supreme"),
