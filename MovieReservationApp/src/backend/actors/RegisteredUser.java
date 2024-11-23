@@ -38,7 +38,7 @@ public class RegisteredUser extends User {
     
     public void payAnnualFee(PaymentDetails paymentDetails) {
         // Process payment for annual fee
-        PaymentGateway.processPayment(paymentDetails, ANNUAL_FEE);
+        Transaction.processPayment(paymentDetails, ANNUAL_FEE);
         this.lastAnnualFeePayment = LocalDateTime.now();
     }
     
@@ -54,7 +54,7 @@ public class RegisteredUser extends User {
     
     private void processRefund(double amount) {
         if (paymentDetails != null) {
-            PaymentGateway.processRefund(paymentDetails, amount);
+            Transaction.processRefund(paymentDetails, amount);
         }
     }
     

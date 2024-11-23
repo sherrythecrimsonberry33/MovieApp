@@ -2,7 +2,7 @@ package backend.Entity;
 
 import java.time.LocalDateTime;
 
-public class PaymentGateway {
+public class Transaction {
     private String transactionId;
     private String status;
     private double amount;
@@ -10,7 +10,7 @@ public class PaymentGateway {
 
 
     //Constructor
-    public PaymentGateway (String transactionId, String status, double amount, LocalDateTime timestamp) {
+    public Transaction (String transactionId, String status, double amount, LocalDateTime timestamp) {
         this.transactionId = transactionId;
         this.status = status;
         this.amount = amount;
