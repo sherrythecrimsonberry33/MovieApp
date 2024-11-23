@@ -1,11 +1,7 @@
 
-
-
-
 package backend.actors;
 
 import java.time.LocalDateTime;
-
 
 
 public class RegisteredUser extends User {
