@@ -1,5 +1,65 @@
-package backend.Entity;
 
+
+// import java.util.List;
+// import java.util.UUID;
+// import java.util.stream.Collectors;
+
+// public class TicketInfo {
+//     private final String ticketId;
+//     private final MovieTimings movieTimings;
+//     private final List<Seat> seats;
+
+//     public TicketInfo(MovieTimings movieTimings, List<Seat> seats) {
+//         this.ticketId = generateTicketId();
+//         this.movieTimings = movieTimings;
+//         this.seats = seats;
+//     }
+
+//     private String generateTicketId() {
+//         return "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+//     }
+
+//     // Essential getters
+//     public String getTicketId() {
+//         return ticketId;
+//     }
+
+//     public String getMovieName() {
+//         return movieTimings.getMovie().getTitle();
+//     }
+
+//     public String getMovieHallName() {
+//         return movieTimings.getMovieHall().getHallName().toString();
+//     }
+
+//     public String getShowTiming() {
+//         return movieTimings.getFormattedMovieTimings();
+//     }
+
+//     public List<Seat> getSeats() {
+//         return seats;
+//     }
+
+//     @Override
+//     public String toString() {
+//         String seatLabels = seats.stream()
+//                 .map(Seat::getSeatLabel)
+//                 .collect(Collectors.joining(", "));
+                
+//         return String.format("Ticket ID: %s\n" +
+//                            "Movie: %s\n" +
+//                            "Hall: %s\n" +
+//                            "Time: %s\n" +
+//                            "Seats: %s",
+//                            ticketId,
+//                            getMovieName(),
+//                            getMovieHallName(),
+//                            getShowTiming(),
+//                            seatLabels);
+//     }
+// }
+
+package backend.Entity;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,20 +69,26 @@ public class TicketInfo {
     private final String ticketId;
     private final MovieTimings movieTimings;
     private final List<Seat> seats;
+    private final double totalPrice;
+    private final String userEmail;
+    private final Transaction transaction;
 
-    public TicketInfo(MovieTimings movieTimings, List<Seat> seats) {
-        this.ticketId = generateTicketId();
+    public TicketInfo(MovieTimings movieTimings, List<Seat> seats, double totalPrice, String userEmail, Transaction transaction) {
+        this.ticketId = "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         this.movieTimings = movieTimings;
         this.seats = seats;
-    }
-
-    private String generateTicketId() {
-        return "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        this.totalPrice = totalPrice;
+        this.userEmail = userEmail;
+        this.transaction = transaction;
     }
 
     // Essential getters
     public String getTicketId() {
         return ticketId;
+    }
+
+    public Movie getMovie() {
+        return movieTimings.getMovie();
     }
 
     public String getMovieName() {
@@ -41,6 +107,22 @@ public class TicketInfo {
         return seats;
     }
 
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public MovieTimings getMovieTimings() {
+        return movieTimings;
+    }
+
     @Override
     public String toString() {
         String seatLabels = seats.stream()
@@ -51,11 +133,13 @@ public class TicketInfo {
                            "Movie: %s\n" +
                            "Hall: %s\n" +
                            "Time: %s\n" +
-                           "Seats: %s",
+                           "Seats: %s\n" +
+                           "Total Price: $%.2f",
                            ticketId,
                            getMovieName(),
                            getMovieHallName(),
                            getShowTiming(),
-                           seatLabels);
+                           seatLabels,
+                           totalPrice);
     }
 }
