@@ -1,4 +1,3 @@
-package MovieReservationApp.tests;
 
 
 import backend.Entity.Movie;
