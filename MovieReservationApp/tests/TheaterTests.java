@@ -7,10 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import java.util.Arrays;
 import java.util.List;
 
-import backend.actions.MovieHall;
-import backend.actions.MovieHallName;
-import backend.actions.Seat;
-import backend.actions.TheatreInfo;
+import backend.Entity.MovieHall;
+import backend.Entity.MovieHallName;
+import backend.Entity.Seat;
+import backend.Entity.TheatreInfo;
 
 class TheaterTests {
     private TheatreInfo theatre;
