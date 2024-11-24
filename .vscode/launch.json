@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "MovieListingMain",
+            "request": "launch",
+            "mainClass": "frontend.MovieListingMain",
+            "projectName": "MovieApp_a707bbd3"
+        },
+        {
+            "type": "java",
+            "name": "MovieListingMain",
+            "request": "launch",
+            "mainClass": "frontend.MovieListingMain",
+            "vmArgs": "--module-path \"${workspaceFolder}/MovieReservationApp/lib/javafx-sdk-13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base",
+            "projectName": "MovieReservationApp"
+        }
+    ]
+}
