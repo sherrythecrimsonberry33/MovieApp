@@ -10,9 +10,8 @@ public enum MovieHallName {
     GOLD_CLASS("Gold Class"),
     SILVER_SCREEN("Silver Screen"),
     PREMIERE("Premiere"),
-    VIP_LOUNGE("VIP Lounge"),
-    CLASSIC("Classic"),
-    FAMILY_FUN("Family Fun");
+    VIP_LOUNGE("VIP Lounge");
+
 
     private final String displayName;
 
