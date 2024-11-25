@@ -1,12 +1,15 @@
 package frontend;
 
 import backend.Entity.*;
+import backend.actors.RegisteredUser;
 import backend.database.SeatBookingDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import java.util.*;
 
@@ -19,15 +22,18 @@ public class SeatSelectionView {
     private MovieTimings movieTiming;
     private int requiredSeats;
     private String userType;
+    private RegisteredUser registeredUser;  // Add this field
     private Set<String> selectedSeats = new HashSet<>();
     private Map<String, Button> seatButtons = new HashMap<>();
     private SeatBookingDAO seatBookingDAO;
     
-    public SeatSelectionView(MovieTimings movieTiming, int requiredSeats, String userType) {
+    // Update constructor
+    public SeatSelectionView(MovieTimings movieTiming, int requiredSeats, String userType, RegisteredUser registeredUser) {
         this.stage = new Stage();
         this.movieTiming = movieTiming;
         this.requiredSeats = requiredSeats;
         this.userType = userType;
+        this.registeredUser = registeredUser;
         this.seatBookingDAO = new SeatBookingDAO();
     }
     
@@ -84,56 +90,138 @@ public class SeatSelectionView {
         return section;
     }
     
+    // private GridPane createSeatsSection() {
+    //     GridPane seatsGrid = new GridPane();
+    //     seatsGrid.setAlignment(Pos.CENTER);
+    //     seatsGrid.setHgap(10);
+    //     seatsGrid.setVgap(10);
+    //     seatsGrid.setPadding(new Insets(20));
+        
+    //     // Screen visualization
+    //     Label screen = new Label("SCREEN");
+    //     screen.setStyle(
+    //         "-fx-background-color: #404040;" +
+    //         "-fx-text-fill: white;" +
+    //         "-fx-padding: 10 100;" +
+    //         "-fx-font-weight: bold;"
+    //     );
+    //     seatsGrid.add(screen, 0, 0, 12, 1);
+        
+    //     // Add seats
+    //     int rows = movieTiming.getMovieHall().getRows();
+    //     int cols = movieTiming.getMovieHall().getColumns();
+        
+    //     for (int row = 0; row < rows; row++) {
+    //         // Row label
+    //         Label rowLabel = new Label(String.valueOf((char)('A' + row)));
+    //         rowLabel.setStyle("-fx-text-fill: white;");
+    //         seatsGrid.add(rowLabel, 0, row + 2);
+            
+    //         for (int col = 0; col < cols; col++) {
+    //             Button seatButton = createSeatButton(row, col);
+    //             seatsGrid.add(seatButton, col + 1, row + 2);
+    //             seatButtons.put(getSeatId(row, col), seatButton);
+    //         }
+    //     }
+        
+    //     return seatsGrid;
+    // }
+
+
+    
+    // private Button createSeatButton(int row, int col) {
+    //     Button button = new Button();
+    //     button.setMinSize(30, 30);
+    //     button.setMaxSize(30, 30);
+    //     button.setStyle(getDefaultSeatStyle());
+        
+    //     String seatId = getSeatId(row, col);
+    //     button.setId(seatId);
+        
+    //     button.setOnAction(e -> handleSeatSelection(seatId, button));
+        
+    //     return button;
+    // }
+
     private GridPane createSeatsSection() {
         GridPane seatsGrid = new GridPane();
         seatsGrid.setAlignment(Pos.CENTER);
-        seatsGrid.setHgap(10);
+        seatsGrid.setHgap(10); // Consistent spacing
         seatsGrid.setVgap(10);
-        seatsGrid.setPadding(new Insets(20));
-        
-        // Screen visualization
-        Label screen = new Label("SCREEN");
-        screen.setStyle(
-            "-fx-background-color: #404040;" +
-            "-fx-text-fill: white;" +
-            "-fx-padding: 10 100;" +
-            "-fx-font-weight: bold;"
-        );
-        seatsGrid.add(screen, 0, 0, 12, 1);
-        
-        // Add seats
+        seatsGrid.setPadding(new Insets(30)); // Increased padding for better spacing
+    
         int rows = movieTiming.getMovieHall().getRows();
         int cols = movieTiming.getMovieHall().getColumns();
-        
+    
+        // Improved cinema screen
+        Rectangle screenBase = new Rectangle(cols * 30, 10); // Scaled to column count
+        screenBase.setFill(Color.web("#606060"));
+        screenBase.setArcHeight(20);
+        screenBase.setArcWidth(40);
+    
+        VBox screenContainer = new VBox(10);
+        screenContainer.setAlignment(Pos.CENTER);
+        Label screenLabel = new Label("SCREEN");
+        screenLabel.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;");
+        screenContainer.getChildren().addAll(screenBase, screenLabel);
+        screenContainer.setPadding(new Insets(0, 0, 40, 0)); // Better separation from seats
+        seatsGrid.add(screenContainer, 0, 0, cols + 2, 1);
+    
+        // Curvature and spacing adjustments
+        double baseSpacing = 10.0;
+        double rowSpacingIncrease = 1.0; // Subtle spacing increase
+        double curveIntensity = 0.6;     // Reduced curve for symmetry
+    
         for (int row = 0; row < rows; row++) {
-            // Row label
-            Label rowLabel = new Label(String.valueOf((char)('A' + row)));
+            Label rowLabel = new Label(String.valueOf((char) ('A' + row)));
             rowLabel.setStyle("-fx-text-fill: white;");
-            seatsGrid.add(rowLabel, 0, row + 2);
-            
+    
+            double currentSpacing = baseSpacing + (row * rowSpacingIncrease);
+    
+            HBox rowBox = new HBox();
+            rowBox.setAlignment(Pos.CENTER);
+            rowBox.setSpacing(currentSpacing);
+    
+            rowBox.getChildren().add(rowLabel);
+    
             for (int col = 0; col < cols; col++) {
                 Button seatButton = createSeatButton(row, col);
-                seatsGrid.add(seatButton, col + 1, row + 2);
+    
+                // Symmetric curvature calculation
+                double centerOffset = col - (cols - 1) / 2.0;
+                double curveOffset = Math.pow(centerOffset / (cols / 2.0), 2);
+                double yOffset = curveOffset * curveIntensity * (rows - row); // Adjusted multiplier
+    
+                VBox seatContainer = new VBox();
+                seatContainer.setPadding(new Insets(yOffset, 0, 0, 0));
+                seatContainer.getChildren().add(seatButton);
+    
+                rowBox.getChildren().add(seatContainer);
                 seatButtons.put(getSeatId(row, col), seatButton);
             }
+    
+            double rowMargin = row * 4.0; // Consistent margin increase
+            GridPane.setMargin(rowBox, new Insets(rowMargin, 0, 0, 0));
+            seatsGrid.add(rowBox, 0, row + 2, cols + 2, 1);
         }
-        
+    
         return seatsGrid;
     }
     
     private Button createSeatButton(int row, int col) {
         Button button = new Button();
-        button.setMinSize(30, 30);
-        button.setMaxSize(30, 30);
+        button.setMinSize(24, 24); // Uniform size
+        button.setMaxSize(24, 24);
         button.setStyle(getDefaultSeatStyle());
-        
+    
         String seatId = getSeatId(row, col);
         button.setId(seatId);
-        
+    
         button.setOnAction(e -> handleSeatSelection(seatId, button));
-        
+    
         return button;
     }
+    
     
     private VBox createBottomSection() {
         VBox section = new VBox(20);
@@ -217,7 +305,6 @@ public class SeatSelectionView {
             return;
         }
         
-        // Convert selected seats to Seat objects
         List<Seat> seats = new ArrayList<>();
         for (String seatId : selectedSeats) {
             int row = seatId.charAt(0) - 'A';
@@ -225,11 +312,12 @@ public class SeatSelectionView {
             seats.add(new Seat(row, col));
         }
         
-        // Create payment view
-        PaymentView paymentView = new PaymentView(movieTiming, seats, userType);
+        // Pass registeredUser to PaymentView
+        PaymentView paymentView = new PaymentView(movieTiming, seats, userType, registeredUser);
         paymentView.show();
         stage.close();
     }
+
     
     private String getSeatId(int row, int col) {
         return String.format("%c%d", (char)('A' + row), col + 1);
