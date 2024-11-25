@@ -455,6 +455,7 @@ import javafx.scene.text.FontWeight;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
 
@@ -554,37 +555,100 @@ public class MovieDetailView {
         return backButton;
     }
 
+    // private HBox createHeaderSection() {
+    //     HBox header = new HBox(30);
+    //     header.setAlignment(Pos.CENTER_LEFT);
+        
+    //     // Movie poster
+    //     ImageView poster = new ImageView(new Image(movie.getPosterUrl(), true));
+    //     poster.setFitWidth(300);
+    //     poster.setFitHeight(450);
+    //     poster.setPreserveRatio(true);
+        
+    //     // Movie info
+    //     VBox info = new VBox(15);
+    //     info.setAlignment(Pos.CENTER_LEFT);
+        
+    //     Label title = new Label(movie.getTitle());
+    //     title.setFont(Font.font("Arial", FontWeight.BOLD, 36));
+    //     title.setTextFill(Color.WHITE);
+        
+    //     Label rating = new Label(String.format("★ %.1f", movie.getRating()));
+    //     rating.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+    //     rating.setTextFill(Color.web("#ffd700"));
+        
+    //     Label genre = new Label(movie.getGenre());
+    //     genre.setFont(Font.font("Arial", FontWeight.NORMAL, 18));
+    //     genre.setTextFill(Color.LIGHTGRAY);
+        
+    //     info.getChildren().addAll(title, rating, genre);
+        
+    //     header.getChildren().addAll(poster, info);
+    //     return header;
+    // }
+
     private HBox createHeaderSection() {
-        HBox header = new HBox(30);
-        header.setAlignment(Pos.CENTER_LEFT);
-        
-        // Movie poster
-        ImageView poster = new ImageView(new Image(movie.getPosterUrl(), true));
-        poster.setFitWidth(300);
-        poster.setFitHeight(450);
-        poster.setPreserveRatio(true);
-        
-        // Movie info
-        VBox info = new VBox(15);
-        info.setAlignment(Pos.CENTER_LEFT);
-        
-        Label title = new Label(movie.getTitle());
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 36));
-        title.setTextFill(Color.WHITE);
-        
-        Label rating = new Label(String.format("★ %.1f", movie.getRating()));
-        rating.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        rating.setTextFill(Color.web("#ffd700"));
-        
-        Label genre = new Label(movie.getGenre());
-        genre.setFont(Font.font("Arial", FontWeight.NORMAL, 18));
-        genre.setTextFill(Color.LIGHTGRAY);
-        
-        info.getChildren().addAll(title, rating, genre);
-        
-        header.getChildren().addAll(poster, info);
-        return header;
+    HBox header = new HBox(30);
+    header.setAlignment(Pos.CENTER_LEFT);
+    
+    // Create ImageView first
+    ImageView poster = new ImageView();
+    poster.setFitWidth(300);
+    poster.setFitHeight(450);
+    poster.setPreserveRatio(true);
+    
+    // Load image with error handling
+    try {
+        Image image = new Image(movie.getPosterUrl(), true);  // true for background loading
+        image.errorProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                try {
+                    // Load default image if URL fails
+                    poster.setImage(new Image("file:MovieReservationApp/assets/no-poster.png"));
+                } catch (Exception e) {
+                    // If even default image fails, create a blank placeholder
+                    Rectangle placeholder = new Rectangle(300, 450);
+                    placeholder.setFill(Color.GRAY);
+                    poster.setImage(null);
+                    System.err.println("Failed to load both movie poster and default image");
+                }
+            }
+        });
+        poster.setImage(image);
+    } catch (Exception e) {
+        try {
+            // Load default image if there's any exception
+            poster.setImage(new Image("file:MovieReservationApp/assets/no-poster.png"));
+        } catch (Exception ex) {
+            // If even default image fails, create a blank placeholder
+            Rectangle placeholder = new Rectangle(300, 450);
+            placeholder.setFill(Color.GRAY);
+            poster.setImage(null);
+            System.err.println("Failed to load both movie poster and default image");
+        }
     }
+    
+    // Movie info
+    VBox info = new VBox(15);
+    info.setAlignment(Pos.CENTER_LEFT);
+    
+    Label title = new Label(movie.getTitle());
+    title.setFont(Font.font("Arial", FontWeight.BOLD, 36));
+    title.setTextFill(Color.WHITE);
+    
+    Label rating = new Label(String.format("★ %.1f", movie.getRating()));
+    rating.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+    rating.setTextFill(Color.web("#ffd700"));
+    
+    Label genre = new Label(movie.getGenre());
+    genre.setFont(Font.font("Arial", FontWeight.NORMAL, 18));
+    genre.setTextFill(Color.LIGHTGRAY);
+    
+    info.getChildren().addAll(title, rating, genre);
+    
+    header.getChildren().addAll(poster, info);
+    return header;
+}
 
     private VBox createSynopsisSection() {
         VBox synopsis = new VBox(15);
@@ -692,10 +756,10 @@ public class MovieDetailView {
         System.out.println("Movie ID: " + movie.getId());
         System.out.println("Movie Title: " + movie.getTitle());
         String userType = (loggedInUser != null) ? "Registered" : "Guest";
-        System.out.println("User Type: " + userType);
         
         try {
-            MovieTimingSelectionView timingView = new MovieTimingSelectionView(movie, userType);
+            // Pass both userType and loggedInUser to MovieTimingSelectionView
+            MovieTimingSelectionView timingView = new MovieTimingSelectionView(movie, userType, loggedInUser);
             timingView.show();
         } catch (Exception e) {
             System.err.println("Error creating timing view: ");
