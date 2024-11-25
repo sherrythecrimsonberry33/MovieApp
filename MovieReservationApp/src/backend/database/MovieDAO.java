@@ -97,7 +97,8 @@ public class MovieDAO {
 
     private Movie mapResultSetToMovie(ResultSet rs) throws SQLException {
         return new Movie(
-            rs.getString("title"),         // Using the constructor from your Movie class
+            rs.getInt("id"),           // Add this line to include the ID
+            rs.getString("title"),
             rs.getString("poster_url"),
             rs.getString("genre"),
             rs.getString("synopsis"),
