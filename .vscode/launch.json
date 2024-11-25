@@ -24,6 +24,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AdminView",
+            "request": "launch",
+            "mainClass": "frontend.AdminView",
+            "projectName": "MovieApp_a707bbd3"
+        },
+        {
+            "type": "java",
             "name": "MainEntryView",
             "request": "launch",
             "mainClass": "frontend.MainEntryView",
