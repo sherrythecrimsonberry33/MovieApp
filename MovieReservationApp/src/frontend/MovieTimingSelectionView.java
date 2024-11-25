@@ -348,6 +348,7 @@
 package frontend;
 
 import backend.Entity.*;
+import backend.actors.RegisteredUser;
 import backend.database.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -371,13 +372,33 @@ public class MovieTimingSelectionView {
     private int selectedSeats = 1;
     private MovieTimingsDAO movieTimingsDAO;
     private String userType;  // "Guest" or "Registered"
+    private RegisteredUser loggedInUser;
 
-    public MovieTimingSelectionView(Movie movie, String userType) {
+    Text errorText = new Text();
+
+
+    public MovieTimingSelectionView(Movie movie, String userType, RegisteredUser loggedInUser) {
         this.movie = movie;
         this.userType = userType;
+        this.loggedInUser = loggedInUser;  // Store logged in user
         this.stage = new Stage();
         this.movieTimingsDAO = new MovieTimingsDAO();
     }
+    
+    // private void handleProceed() {
+    //     if (selectedTiming != null) {
+    //         // Pass registeredUser to SeatSelectionView
+    //         SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType, loggedInUser);
+    //         seatView.show();
+    //         stage.close();
+    //     } else {
+    //         errorText.setText("Please select a show timing");
+    //     }
+    // }
+   
+
+   
+
 
     public void show() {
         VBox mainLayout = new VBox(20);
@@ -403,13 +424,12 @@ public class MovieTimingSelectionView {
 
         // Initialize timingGroup
         ToggleGroup timingGroup = new ToggleGroup();
-
-
-
+        
+        
         // Set up button actions
         proceedButton.setOnAction(e -> {
             if (selectedTiming != null) {
-                SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType);
+                SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType, loggedInUser);
                 seatView.show();
                 stage.close();
             } else {
@@ -640,7 +660,7 @@ public class MovieTimingSelectionView {
         // Add action handler
         proceedButton.setOnAction(e -> {
             if (selectedTiming != null) {
-                SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType);
+                SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType, loggedInUser);
                 seatView.show();
                 stage.close();
             }
@@ -673,3 +693,5 @@ public class MovieTimingSelectionView {
 
     }
 }
+
+
