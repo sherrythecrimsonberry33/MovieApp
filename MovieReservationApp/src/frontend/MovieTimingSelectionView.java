@@ -403,7 +403,7 @@ public class MovieTimingSelectionView {
 
         // Initialize timingGroup
         ToggleGroup timingGroup = new ToggleGroup();
-        proceedButton.setDisable(false); // Ensure this is explicitly set if needed.
+
 
 
         // Set up button actions
@@ -520,7 +520,7 @@ public class MovieTimingSelectionView {
 
         ToggleGroup timingGroup = new ToggleGroup();
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
+    
         for (MovieTimings timing : timings) {
             VBox timeCard = new VBox(5);
             timeCard.setStyle(
@@ -528,13 +528,31 @@ public class MovieTimingSelectionView {
                 "-fx-padding: 10px;" +
                 "-fx-background-radius: 4px;"
             );
-
+    
             RadioButton timeButton = new RadioButton(
                 timing.getShowDateTime().format(timeFormatter)
             );
             timeButton.setToggleGroup(timingGroup);
             timeButton.setUserData(timing);
             timeButton.setStyle("-fx-text-fill: white;");
+    
+            // Add selection listener
+            timeButton.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal) {
+                    selectedTiming = timing;
+                    timeCard.setStyle(
+                        "-fx-background-color: " + NETFLIX_RED + ";" +
+                        "-fx-padding: 10px;" +
+                        "-fx-background-radius: 4px;"
+                    );
+                } else {
+                    timeCard.setStyle(
+                        "-fx-background-color: #3a3a3a;" +
+                        "-fx-padding: 10px;" +
+                        "-fx-background-radius: 4px;"
+                    );
+                }
+            });
 
             Label hallLabel = new Label(timing.getMovieHall().getHallName().getDisplayName());
             hallLabel.setStyle("-fx-text-fill: #cccccc; -fx-font-size: 12px;");
@@ -612,9 +630,46 @@ public class MovieTimingSelectionView {
             "-fx-text-fill: white;" +
             "-fx-font-weight: bold;" +
             "-fx-padding: 10 20;" +
-            "-fx-background-radius: 4px;"
+            "-fx-background-radius: 4px;" +
+            "-fx-cursor: hand;"
         );
-        proceedButton.setDisable(true); // Initially disable
+    
+        // Set initial state
+    
+    
+        // Add action handler
+        proceedButton.setOnAction(e -> {
+            if (selectedTiming != null) {
+                SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType);
+                seatView.show();
+                stage.close();
+            }
+        });
+    
+        // Add hover effects
+        proceedButton.setOnMouseEntered(e -> 
+            proceedButton.setStyle(
+                "-fx-background-color: derive(" + NETFLIX_RED + ", -10%);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-padding: 10 20;" +
+                "-fx-background-radius: 4px;" +
+                "-fx-cursor: hand;"
+            )
+        );
+    
+        proceedButton.setOnMouseExited(e -> 
+            proceedButton.setStyle(
+                "-fx-background-color: " + NETFLIX_RED + ";" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;" +
+                "-fx-padding: 10 20;" +
+                "-fx-background-radius: 4px;" +
+                "-fx-cursor: hand;"
+            )
+        );
+    
         return proceedButton;
+
     }
 }
