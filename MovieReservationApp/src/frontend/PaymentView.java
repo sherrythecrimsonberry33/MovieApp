@@ -2,7 +2,8 @@ package frontend;
 
 
 import backend.Entity.*;
-import backend.Entity.receipt.*;
+import backend.Entity.receipt.GenerateReceipt;
+import backend.Entity.receipt.SendEmail;
 import backend.database.SeatBookingDAO;
 import backend.actors.RegisteredUser;
 import javafx.concurrent.Task;
@@ -38,24 +39,22 @@ public class PaymentView {
     private VBox mainContent;
     private VBox loadingContent;
     
-    // Registered user specific fields
-    private RegisteredUser registeredUser;
-    private CheckBox useStoredPaymentCheckbox;
-    private VBox paymentFieldsContainer;
+    private RegisteredUser loggedInUser;
+    private RadioButton useStoredCardRadio;
+    private RadioButton newCardRadio;
+    private VBox newCardForm;
+
     
-    public PaymentView(MovieTimings movieTiming, List<Seat> selectedSeats, String userType) {
+    public PaymentView(MovieTimings movieTiming, List<Seat> selectedSeats, String userType, RegisteredUser loggedInUser) {
         this.stage = new Stage();
         this.movieTiming = movieTiming;
         this.selectedSeats = selectedSeats;
         this.userType = userType;
+        this.loggedInUser = loggedInUser;
         this.seatBookingDAO = new SeatBookingDAO();
         this.totalAmount = calculateTotalAmount();
-        
-        // If this is a registered user, get their details
-        // if (userType.equals("Registered") && MovieListingView.getLoggedInUser() != null) {
-        //     this.registeredUser = MovieListingView.getLoggedInUser();
-        // }
     }
+    
     
     public void show() {
         BorderPane mainLayout = new BorderPane();
@@ -122,6 +121,59 @@ public class PaymentView {
         return summary;
     }
     
+    // private VBox createPaymentForm() {
+    //     VBox form = new VBox(15);
+    //     form.setStyle(
+    //         "-fx-background-color: " + CARD_BACKGROUND + ";" +
+    //         "-fx-padding: 20px;" +
+    //         "-fx-background-radius: 8px;"
+    //     );
+        
+    //     // Only add email field for guest users
+    //     if (userType.equals("Guest")) {
+    //         Label emailLabel = new Label("Email Address");
+    //         emailLabel.setStyle("-fx-text-fill: white;");
+    //         emailField = createStyledTextField("Enter your email");
+    //         form.getChildren().addAll(emailLabel, emailField);
+    //     }
+        
+    //     // For registered users with saved payment details
+    //     if (registeredUser != null && registeredUser.getSavedPaymentDetails() != null) {
+    //         // Create checkbox for using saved payment
+    //         useStoredPaymentCheckbox = new CheckBox("Use saved payment method");
+    //         useStoredPaymentCheckbox.setStyle("-fx-text-fill: white;");
+    //         useStoredPaymentCheckbox.setSelected(true);
+            
+    //         // Display masked card info
+    //         PaymentDetails savedDetails = registeredUser.getSavedPaymentDetails();
+    //         String maskedCard = "Card ending in " + 
+    //             savedDetails.getCardNumber().substring(savedDetails.getCardNumber().length() - 4);
+    //         Label savedCardInfo = new Label(maskedCard);
+    //         savedCardInfo.setStyle("-fx-text-fill: #cccccc;");
+            
+    //         form.getChildren().addAll(useStoredPaymentCheckbox, savedCardInfo);
+            
+    //         // Create container for payment fields
+    //         paymentFieldsContainer = new VBox(10);
+    //         paymentFieldsContainer.setVisible(false);
+            
+    //         // Add listener to checkbox
+    //         useStoredPaymentCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+    //             paymentFieldsContainer.setVisible(!newVal);
+    //         });
+            
+    //         // Add payment fields to container
+    //         createPaymentFields(paymentFieldsContainer);
+    //         form.getChildren().add(paymentFieldsContainer);
+    //     } else {
+    //         // For guests or registered users without saved payment details
+    //         createPaymentFields(form);
+    //     }
+        
+    //     return form;
+    // }
+
+    // In PaymentView.java
     private VBox createPaymentForm() {
         VBox form = new VBox(15);
         form.setStyle(
@@ -129,51 +181,56 @@ public class PaymentView {
             "-fx-padding: 20px;" +
             "-fx-background-radius: 8px;"
         );
-        
-        // Only add email field for guest users
-        if (userType.equals("Guest")) {
-            Label emailLabel = new Label("Email Address");
-            emailLabel.setStyle("-fx-text-fill: white;");
-            emailField = createStyledTextField("Enter your email");
-            form.getChildren().addAll(emailLabel, emailField);
-        }
-        
-        // For registered users with saved payment details
-        if (registeredUser != null && registeredUser.getSavedPaymentDetails() != null) {
-            // Create checkbox for using saved payment
-            useStoredPaymentCheckbox = new CheckBox("Use saved payment method");
-            useStoredPaymentCheckbox.setStyle("-fx-text-fill: white;");
-            useStoredPaymentCheckbox.setSelected(true);
+
+        if (userType.equals("Registered") && loggedInUser != null) {
+            // Create radio buttons for payment options
+            ToggleGroup paymentOptionGroup = new ToggleGroup();
             
-            // Display masked card info
-            PaymentDetails savedDetails = registeredUser.getSavedPaymentDetails();
-            String maskedCard = "Card ending in " + 
-                savedDetails.getCardNumber().substring(savedDetails.getCardNumber().length() - 4);
+            useStoredCardRadio = new RadioButton("Use Stored Card");
+            useStoredCardRadio.setToggleGroup(paymentOptionGroup);
+            useStoredCardRadio.setSelected(true);
+            useStoredCardRadio.setStyle("-fx-text-fill: white;");
+            
+            newCardRadio = new RadioButton("Use New Card");
+            newCardRadio.setToggleGroup(paymentOptionGroup);
+            newCardRadio.setStyle("-fx-text-fill: white;");
+            
+            // Show masked stored card info
+            PaymentDetails savedDetails = loggedInUser.getSavedPaymentDetails();
+            String maskedCard = String.format("Card ending in %s", 
+                savedDetails.getCardNumber().substring(savedDetails.getCardNumber().length() - 4));
             Label savedCardInfo = new Label(maskedCard);
             savedCardInfo.setStyle("-fx-text-fill: #cccccc;");
             
-            form.getChildren().addAll(useStoredPaymentCheckbox, savedCardInfo);
+            // Create new card form container
+            newCardForm = new VBox(10);
+            createPaymentFields(newCardForm);
+            newCardForm.setVisible(false);
             
-            // Create container for payment fields
-            paymentFieldsContainer = new VBox(10);
-            paymentFieldsContainer.setVisible(false);
-            
-            // Add listener to checkbox
-            useStoredPaymentCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                paymentFieldsContainer.setVisible(!newVal);
+            // Add listener to toggle visibility
+            paymentOptionGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
+                newCardForm.setVisible(newCardRadio.isSelected());
             });
             
-            // Add payment fields to container
-            createPaymentFields(paymentFieldsContainer);
-            form.getChildren().add(paymentFieldsContainer);
+            form.getChildren().addAll(
+                new Label("Payment Options:"),
+                useStoredCardRadio,
+                savedCardInfo,
+                newCardRadio,
+                newCardForm
+            );
         } else {
-            // For guests or registered users without saved payment details
+            // For guest users
+            Label emailLabel = new Label("Email Address");
+            emailLabel.setStyle("-fx-text-fill: white;");
+            emailField = createStyledTextField("Enter your email");
             createPaymentFields(form);
+            form.getChildren().addAll(emailLabel, emailField);
         }
         
         return form;
     }
-    
+        
     private void createPaymentFields(VBox container) {
         // Payment details fields
         Label cardLabel = new Label("Card Number");
@@ -215,23 +272,149 @@ public class PaymentView {
         return loading;
     }
     
-    private void handlePayment() {
-        if (!validateForm()) {
-            return;
-        }
+    // private void handlePayment() {
+    //     if (!validateForm()) {
+    //         return;
+    //     }
         
-        showLoading(true);
+    //     showLoading(true);
         
-        Task<Boolean> paymentTask = new Task<>() {
-            @Override
-            protected Boolean call() throws Exception {
-                PaymentDetails paymentDetails;
+    //     Task<Boolean> paymentTask = new Task<>() {
+    //         @Override
+    //         protected Boolean call() throws Exception {
+    //             PaymentDetails paymentDetails;
                 
-                // Use stored payment details if checkbox is selected
-                if (registeredUser != null && 
-                    useStoredPaymentCheckbox != null && 
-                    useStoredPaymentCheckbox.isSelected()) {
-                    paymentDetails = registeredUser.getSavedPaymentDetails();
+    //             // Use stored payment details if checkbox is selected
+    //             if (registeredUser != null && 
+    //                 useStoredPaymentCheckbox != null && 
+    //                 useStoredPaymentCheckbox.isSelected()) {
+    //                 paymentDetails = registeredUser.getSavedPaymentDetails();
+    //             } else {
+    //                 paymentDetails = new PaymentDetails(
+    //                     cardNumberField.getText(),
+    //                     Integer.parseInt(expiryMonthField.getText()),
+    //                     Integer.parseInt(expiryYearField.getText()),
+    //                     cvvField.getText(),
+    //                     cardHolderField.getText()
+    //                 );
+    //             }
+                
+    //             // Process payment
+    //             Transaction transaction = Transaction.processPayment(paymentDetails, totalAmount);
+                
+    //             if (transaction.getStatus().equals("APPROVED")) {
+    //                 String userEmail = userType.equals("Guest") ? emailField.getText() : 
+    //                     registeredUser.getEmail();
+                    
+    //                 // Create ticket first to get the ID
+    //                 TicketInfo ticketInfo = new TicketInfo(
+    //                     movieTiming, selectedSeats, totalAmount, userEmail, transaction);
+                    
+    //                 // Book seats with ticket ID
+    //                 boolean seatsBooked = seatBookingDAO.bookSeats(
+    //                     movieTiming.getId(), selectedSeats, ticketInfo.getTicketId());
+                    
+    //                 if (seatsBooked) {
+    //                     GenerateReceipt receipt = new GenerateReceipt(
+    //                         ticketInfo, movieTiming.getTicketPrice(), 
+    //                         TheatreInfo.getInstance());
+                        
+    //                     SendEmail emailSender = new SendEmail();
+    //                     emailSender.sendTicketAndReceipt(userEmail, ticketInfo, receipt);
+                        
+    //                     return true;
+    //                 }
+    //             }
+    //             return false;
+    //         }
+    //     };
+
+    // private void handlePayment() {
+    //     if (!validateForm()) {
+    //         return;
+    //     }
+        
+    //     showLoading(true);
+        
+    //     Task<Boolean> paymentTask = new Task<>() {
+    //         @Override
+    //         protected Boolean call() throws Exception {
+    //             PaymentDetails paymentDetails;
+                
+    //             if (userType.equals("Registered") && loggedInUser != null) {
+    //                 if (useStoredCardRadio.isSelected()) {
+    //                     paymentDetails = loggedInUser.getSavedPaymentDetails();
+    //                 } else {
+    //                     paymentDetails = new PaymentDetails(
+    //                         cardNumberField.getText(),
+    //                         Integer.parseInt(expiryMonthField.getText()),
+    //                         Integer.parseInt(expiryYearField.getText()),
+    //                         cvvField.getText(),
+    //                         cardHolderField.getText()
+    //                     );
+    //                 }
+    //             } else {
+    //                 paymentDetails = new PaymentDetails(
+    //                     cardNumberField.getText(),
+    //                     Integer.parseInt(expiryMonthField.getText()),
+    //                     Integer.parseInt(expiryYearField.getText()),
+    //                     cvvField.getText(),
+    //                     cardHolderField.getText()
+    //                 );
+    //             }
+                
+    //             Transaction transaction = Transaction.processPayment(paymentDetails, totalAmount);
+                
+    //             if (transaction.getStatus().equals("APPROVED")) {
+    //                 String userEmail = userType.equals("Guest") ? emailField.getText() : 
+    //                     loggedInUser.getEmail();
+                    
+    //                 TicketInfo ticketInfo = new TicketInfo(
+    //                     movieTiming, selectedSeats, totalAmount, userEmail, transaction);
+                    
+    //                 boolean seatsBooked = seatBookingDAO.bookSeats(
+    //                     movieTiming.getId(), selectedSeats, ticketInfo.getTicketId());
+                    
+    //                 return seatsBooked;
+    //             }
+    //             return false;
+    //         }
+    //     };
+    //         // ... rest of the method remains the same
+        
+        
+    //     paymentTask.setOnSucceeded(e -> {
+    //         showLoading(false);
+    //         if (paymentTask.getValue()) {
+    //             showSuccessAndClose();
+    //         } else {
+    //             showError("Payment failed. Please try again.");
+    //         }
+    //     });
+        
+    //     paymentTask.setOnFailed(e -> {
+    //         showLoading(false);
+    //         showError("An error occurred: " + paymentTask.getException().getMessage());
+    //     });
+        
+    //     new Thread(paymentTask).start();
+    // }
+
+    private void handlePayment() {
+    if (!validateForm()) {
+        return;
+    }
+    
+    showLoading(true);
+    
+    Task<Boolean> paymentTask = new Task<>() {
+        @Override
+        protected Boolean call() throws Exception {
+            PaymentDetails paymentDetails;
+            
+            if (userType.equals("Registered") && loggedInUser != null) {
+                if (useStoredCardRadio.isSelected()) {
+                    paymentDetails = loggedInUser.getSavedPaymentDetails();
                 } else {
                     paymentDetails = new PaymentDetails(
                         cardNumberField.getText(),
@@ -241,37 +424,46 @@ public class PaymentView {
                         cardHolderField.getText()
                     );
                 }
-                
-                // Process payment
-                Transaction transaction = Transaction.processPayment(paymentDetails, totalAmount);
-                
-                if (transaction.getStatus().equals("APPROVED")) {
-                    String userEmail = userType.equals("Guest") ? emailField.getText() : 
-                        registeredUser.getEmail();
-                    
-                    // Create ticket first to get the ID
-                    TicketInfo ticketInfo = new TicketInfo(
-                        movieTiming, selectedSeats, totalAmount, userEmail, transaction);
-                    
-                    // Book seats with ticket ID
-                    boolean seatsBooked = seatBookingDAO.bookSeats(
-                        movieTiming.getId(), selectedSeats, ticketInfo.getTicketId());
-                    
-                    if (seatsBooked) {
-                        GenerateReceipt receipt = new GenerateReceipt(
-                            ticketInfo, movieTiming.getTicketPrice(), 
-                            TheatreInfo.getInstance());
-                        
-                        SendEmail emailSender = new SendEmail();
-                        emailSender.sendTicketAndReceipt(userEmail, ticketInfo, receipt);
-                        
-                        return true;
-                    }
-                }
-                return false;
+            } else {
+                paymentDetails = new PaymentDetails(
+                    cardNumberField.getText(),
+                    Integer.parseInt(expiryMonthField.getText()),
+                    Integer.parseInt(expiryYearField.getText()),
+                    cvvField.getText(),
+                    cardHolderField.getText()
+                );
             }
-        };
-        
+            
+            Transaction transaction = Transaction.processPayment(paymentDetails, totalAmount);
+            
+            if (transaction.getStatus().equals("APPROVED")) {
+                String userEmail = userType.equals("Guest") ? emailField.getText() : 
+                    loggedInUser.getEmail();
+                
+                // Create ticket first to get the ID
+                TicketInfo ticketInfo = new TicketInfo(
+                    movieTiming, selectedSeats, totalAmount, userEmail, transaction);
+                
+                // Book seats with ticket ID
+                boolean seatsBooked = seatBookingDAO.bookSeats(
+                    movieTiming.getId(), selectedSeats, ticketInfo.getTicketId());
+                
+                if (seatsBooked) {
+                    // Generate receipt and send email
+                    GenerateReceipt receipt = new GenerateReceipt(
+                        ticketInfo, movieTiming.getTicketPrice(), 
+                        TheatreInfo.getInstance());
+                    
+                    SendEmail emailSender = new SendEmail();
+                    emailSender.sendTicketAndReceipt(userEmail, ticketInfo, receipt);
+                    
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+    
         paymentTask.setOnSucceeded(e -> {
             showLoading(false);
             if (paymentTask.getValue()) {
@@ -290,20 +482,11 @@ public class PaymentView {
     }
     
     private boolean validateForm() {
-        // For registered users using saved payment details, skip validation
-        if (registeredUser != null && 
-            useStoredPaymentCheckbox != null && 
-            useStoredPaymentCheckbox.isSelected()) {
-            return true;
+        if (userType.equals("Registered") && loggedInUser != null && useStoredCardRadio.isSelected()) {
+            return true; // Skip validation for stored card
         }
         
-        // Regular validation for new payment details
-        if (userType.equals("Guest") && (emailField.getText().isEmpty() || 
-            !emailField.getText().matches("^[A-Za-z0-9+_.-]+@(.+)$"))) {
-            showError("Please enter a valid email address.");
-            return false;
-        }
-        
+        // Validate new card details
         if (cardNumberField.getText().isEmpty() || !cardNumberField.getText().matches("\\d{13,19}")) {
             showError("Please enter a valid card number.");
             return false;
@@ -332,6 +515,7 @@ public class PaymentView {
         
         return true;
     }
+
     
     private void showLoading(boolean show) {
         Platform.runLater(() -> {
