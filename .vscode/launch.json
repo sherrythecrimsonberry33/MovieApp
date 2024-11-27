@@ -1,4 +1,4 @@
-// {
+ // {
 //     "configurations": [
 //         {
 //             "type": "java",
@@ -22,28 +22,32 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "java",
-            "name": "AdminView",
-            "request": "launch",
-            "mainClass": "frontend.AdminView",
-            "projectName": "MovieApp_a707bbd3"
-        },
+        // {
+        //     "type": "java",
+        //     "name": "MovieListingView",
+        //     "request": "launch",
+        //     "mainClass": "frontend.MovieListingView",
+        //     "projectName": "MovieApp_a707bbd3"
+        // },
+        // {
+        //     "type": "java",
+        //     "name": "AdminView",
+        //     "request": "launch",
+        //     "mainClass": "frontend.AdminView"
+        // },
         {
             "type": "java",
             "name": "MainEntryView",
             "request": "launch",
             "mainClass": "frontend.MainEntryView",
-            "vmArgs": "--module-path \"MovieReservationApp/lib/javafx-sdk-13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics",
-            "projectName": "MovieApp_a707bbd3"
+            "vmArgs": "--module-path \"MovieReservationApp/lib/javafx-sdk-13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
         },
         {
             "type": "java",
-            "name": "MovieListingMain",
+            "name": "AdminView",
             "request": "launch",
-            "mainClass": "frontend.MovieListingMain",
-            "vmArgs": "--module-path \"MovieReservationApp/lib/javafx-sdk-13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics",
-            "projectName": "MovieApp_a707bbd3"
+            "mainClass": "frontend.AdminView",
+            "vmArgs": "--module-path \"MovieReservationApp/lib/javafx-sdk-13/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics"
         }
     ]
 }

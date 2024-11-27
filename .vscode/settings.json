@@ -17,5 +17,5 @@
         "MovieReservationApp/lib/javafx-sdk-13/lib/javafx-swt.jar"
     ],
     "java.project.sourcePaths": ["MovieReservationApp/src", "MovieReservationApp/tests"],
-    "java.configuration.updateBuildConfiguration": "automatic"
+
 }
