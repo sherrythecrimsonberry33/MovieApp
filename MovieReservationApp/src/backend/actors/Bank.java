@@ -1,8 +1,8 @@
 package backend.actors;
 
 import backend.Entity.PaymentDetails;
+import backend.Entity.PaymentValidation;
 import backend.Entity.Transaction;
-import backend.Entity.validation.PaymentValidation;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;

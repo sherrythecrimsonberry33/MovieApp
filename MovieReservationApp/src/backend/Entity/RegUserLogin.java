@@ -1,17 +1,15 @@
 package backend.Entity;
 
 
-import backend.Entity.validation.PaymentValidation;
-
+import backend.actors.RegisteredUser;
+import backend.database.DatabaseConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import backend.database.DatabaseConnection;
-import backend.actors.RegisteredUser;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class RegUserLogin {
