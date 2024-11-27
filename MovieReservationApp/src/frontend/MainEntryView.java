@@ -15,7 +15,7 @@ import javafx.scene.layout.BorderPane;
 public class MainEntryView extends Application {
     private static final String DARK_BACKGROUND = "#1a1a1a";
     private static final String NETFLIX_RED = "#e50914";
-    private static final String LOGO_PATH = "MovieReservationApp\\assets\\APlogo.png";
+    private static final String LOGO_PATH = "MovieReservationApp/assets/APlogo.png";
     private Stage primaryStage;
 
     @Override

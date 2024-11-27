@@ -35,7 +35,7 @@ public class MovieListingView extends Application {
     private static final String DARK_BACKGROUND = "#1a1a1a";
     private static final String NETFLIX_RED = "#e50914";
     private static final String CARD_BACKGROUND = "#2a2a2a";
-    private static final String LOGO_PATH = "MovieReservationApp\\assets\\APlogo.png";
+    private static final String LOGO_PATH = "MovieReservationApp/assets/APlogo.png";
 
     @Override
     public void start(Stage primaryStage) {
@@ -287,7 +287,4 @@ public class MovieListingView extends Application {
         alert.showAndWait();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 }
