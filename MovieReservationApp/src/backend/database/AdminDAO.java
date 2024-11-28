@@ -1,6 +1,5 @@
 package backend.database;
 
-
 import backend.Entity.Movie;
 import backend.Entity.MovieHallName;
 import java.sql.*;

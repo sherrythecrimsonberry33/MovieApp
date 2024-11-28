@@ -1,6 +1,5 @@
 package frontend;
 
-
 import backend.Entity.Movie;
 import backend.actors.RegisteredUser;
 import backend.database.MovieDAO;

@@ -1,6 +1,5 @@
 package backend.database;
 
-
 import backend.Entity.Seat;
 import java.sql.*;
 import java.util.ArrayList;

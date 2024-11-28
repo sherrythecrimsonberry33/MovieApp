@@ -90,58 +90,6 @@ public class SeatSelectionView {
         return section;
     }
     
-    // private GridPane createSeatsSection() {
-    //     GridPane seatsGrid = new GridPane();
-    //     seatsGrid.setAlignment(Pos.CENTER);
-    //     seatsGrid.setHgap(10);
-    //     seatsGrid.setVgap(10);
-    //     seatsGrid.setPadding(new Insets(20));
-        
-    //     // Screen visualization
-    //     Label screen = new Label("SCREEN");
-    //     screen.setStyle(
-    //         "-fx-background-color: #404040;" +
-    //         "-fx-text-fill: white;" +
-    //         "-fx-padding: 10 100;" +
-    //         "-fx-font-weight: bold;"
-    //     );
-    //     seatsGrid.add(screen, 0, 0, 12, 1);
-        
-    //     // Add seats
-    //     int rows = movieTiming.getMovieHall().getRows();
-    //     int cols = movieTiming.getMovieHall().getColumns();
-        
-    //     for (int row = 0; row < rows; row++) {
-    //         // Row label
-    //         Label rowLabel = new Label(String.valueOf((char)('A' + row)));
-    //         rowLabel.setStyle("-fx-text-fill: white;");
-    //         seatsGrid.add(rowLabel, 0, row + 2);
-            
-    //         for (int col = 0; col < cols; col++) {
-    //             Button seatButton = createSeatButton(row, col);
-    //             seatsGrid.add(seatButton, col + 1, row + 2);
-    //             seatButtons.put(getSeatId(row, col), seatButton);
-    //         }
-    //     }
-        
-    //     return seatsGrid;
-    // }
-
-
-    
-    // private Button createSeatButton(int row, int col) {
-    //     Button button = new Button();
-    //     button.setMinSize(30, 30);
-    //     button.setMaxSize(30, 30);
-    //     button.setStyle(getDefaultSeatStyle());
-        
-    //     String seatId = getSeatId(row, col);
-    //     button.setId(seatId);
-        
-    //     button.setOnAction(e -> handleSeatSelection(seatId, button));
-        
-    //     return button;
-    // }
 
     private GridPane createSeatsSection() {
         GridPane seatsGrid = new GridPane();

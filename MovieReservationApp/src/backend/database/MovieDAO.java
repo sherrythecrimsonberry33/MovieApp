@@ -1,9 +1,8 @@
 package backend.database;
 
-
+import backend.Entity.Movie;
 import java.sql.*;
 import java.util.*;
-import backend.Entity.Movie;
 
 public class MovieDAO {
     private static final String SELECT_ALL_MOVIES = "SELECT * FROM movies";

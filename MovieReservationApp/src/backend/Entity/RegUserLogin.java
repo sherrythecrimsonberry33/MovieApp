@@ -1,6 +1,5 @@
 package backend.Entity;
 
-
 import backend.actors.RegisteredUser;
 import backend.database.DatabaseConnection;
 import java.security.MessageDigest;
