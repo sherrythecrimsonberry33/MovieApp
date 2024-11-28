@@ -51,9 +51,16 @@ public class MovieListingView extends Application {
         // Show the movie list initially
         showMovieList();
 
-        Scene scene = new Scene(mainLayout, 1200, 800);
+        // Scene scene = new Scene(mainLayout, 1200, 800);
+        // primaryStage.setTitle("AcmePlex - Now Showing");
+        // primaryStage.setScene(scene);
+        // primaryStage.show();
+
+        Scene scene = new Scene(mainLayout);
         primaryStage.setTitle("AcmePlex - Now Showing");
         primaryStage.setScene(scene);
+        // Enable full-screen mode
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

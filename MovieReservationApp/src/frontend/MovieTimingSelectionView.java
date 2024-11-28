@@ -38,21 +38,6 @@ public class MovieTimingSelectionView {
         this.movieTimingsDAO = new MovieTimingsDAO();
     }
     
-    // private void handleProceed() {
-    //     if (selectedTiming != null) {
-    //         // Pass registeredUser to SeatSelectionView
-    //         SeatSelectionView seatView = new SeatSelectionView(selectedTiming, selectedSeats, userType, loggedInUser);
-    //         seatView.show();
-    //         stage.close();
-    //     } else {
-    //         errorText.setText("Please select a show timing");
-    //     }
-    // }
-   
-
-   
-
-
     public void show() {
         VBox mainLayout = new VBox(20);
         mainLayout.setStyle("-fx-background-color: " + DARK_BACKGROUND + ";");
@@ -109,10 +94,17 @@ public class MovieTimingSelectionView {
             errorText
         );
 
-        Scene scene = new Scene(mainLayout, 500, 700);
+        // Scene scene = new Scene(mainLayout, 500, 700);
+        // stage.setTitle("Select Show Timing - " + movie.getTitle());
+        // stage.setScene(scene);
+        // stage.show();
+
+        Scene scene = new Scene(mainLayout);
         stage.setTitle("Select Show Timing - " + movie.getTitle());
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
+
     }
 
     private VBox createMovieInfoSection() {
@@ -308,7 +300,6 @@ public class MovieTimingSelectionView {
         );
     
         // Set initial state
-    
     
         // Add action handler
         proceedButton.setOnAction(e -> {
