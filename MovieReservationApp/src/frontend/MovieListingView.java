@@ -295,7 +295,6 @@ package frontend;
 import backend.Entity.Movie;
 import backend.actors.RegisteredUser;
 import backend.database.MovieDAO;
-import backend.database.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

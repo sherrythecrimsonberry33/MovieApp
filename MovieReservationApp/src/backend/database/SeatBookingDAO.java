@@ -172,16 +172,7 @@
 
 
 package backend.database;
-
-import backend.Entity.Movie;
-import backend.Entity.MovieHall;
-import backend.Entity.MovieHallName;
-import backend.Entity.MovieTimings;
 import backend.Entity.Seat;
-import backend.Entity.TheatreInfo;
-import backend.Entity.TicketInfo;
-import backend.Entity.Transaction;
-import backend.Entity.receipt.GenerateReceipt;
 import backend.Entity.receipt.SendEmail;
 
 import java.sql.*;
