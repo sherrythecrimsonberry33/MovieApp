@@ -72,4 +72,37 @@ public class SendEmail {
         html.append("</body></html>");
         return html.toString();
     }
+
+    
+    public void sendCancellationEmail(String recipientEmail) throws MessagingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true"); // Enable STARTTLS
+        props.put("mail.smtp.host", SMTP_HOST);
+        props.put("mail.smtp.port", SMTP_PORT);
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(SENDER_EMAIL));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+        message.setSubject("Your AcmePlex Ticket Cancellation");
+
+        String emailContent = "<html><body style='font-family: Arial, sans-serif;'>" +
+                              "<h2>Ticket Cancellation Confirmation</h2>" +
+                              "<p>Dear Customer,</p>" +
+                              "<p>Your ticket has been successfully canceled.</p>" +
+                              "<p>If you have any questions or need further assistance, please contact our support team.</p>" +
+                              "<br><p>Thank you for choosing AcmePlex Theaters!</p>" +
+                              "</body></html>";
+
+        message.setContent(emailContent, "text/html");
+
+        Transport.send(message);
+    }
 }
