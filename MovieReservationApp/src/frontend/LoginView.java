@@ -116,7 +116,16 @@ public class LoginView {
         return loginForm;
     }
 
-    private VBox createSignupForm() {
+    private ScrollPane createSignupForm() {
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle(
+            "-fx-background: transparent;" +
+            "-fx-background-color: transparent;" +
+            "-fx-padding: 0;" +
+            "-fx-border-width: 0;"
+        );
+
         VBox signupForm = new VBox(25); // Increased spacing
         signupForm.setStyle(
             "-fx-background-color: " + CARD_BACKGROUND + ";" +
@@ -224,7 +233,8 @@ public class LoginView {
             errorText
         );
 
-        return signupForm;
+        scrollPane.setContent(signupForm);
+        return scrollPane;  // Instead of returning signupForm
     }
 
     private VBox createFieldContainer(Control field) {
