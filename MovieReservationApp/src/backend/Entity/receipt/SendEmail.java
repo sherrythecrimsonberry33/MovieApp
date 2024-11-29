@@ -3,10 +3,12 @@ package backend.Entity.receipt;
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.io.UnsupportedEncodingException;
 
 import backend.Entity.TicketInfo;
 
 import java.util.stream.Collectors;
+
 
 public class SendEmail {
     private static final String SMTP_HOST = "smtp.gmail.com";
@@ -30,7 +32,11 @@ public class SendEmail {
         });
 
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(SENDER_EMAIL));
+        try {
+            message.setFrom(new InternetAddress(SENDER_EMAIL, "AcmePlex Cinema"));
+        } catch (UnsupportedEncodingException e) {
+            throw new MessagingException("Failed to set sender email address", e);
+        }
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
         message.setSubject("Your AcmePlex Movie Tickets and Receipt");
 
