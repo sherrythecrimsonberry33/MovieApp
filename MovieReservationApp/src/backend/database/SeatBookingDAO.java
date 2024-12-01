@@ -345,14 +345,12 @@ public class SeatBookingDAO {
             ResultSet rs = selectPs.executeQuery();
 
             if (rs.next()) {
-                int movieTimingId = rs.getInt("movie_timing_id");
                 Date showDate = rs.getDate("show_date");
                 Time showTime = rs.getTime("show_time");
-                String movieTitle = rs.getString("title");
                 LocalDateTime showDateTime = LocalDateTime.of(showDate.toLocalDate(), showTime.toLocalTime());
 
-                // Check if cancellation is allowed (e.g., more than 2 hours before showtime)
-                if (showDateTime.isBefore(LocalDateTime.now().plusHours(2))) {
+       
+                if (showDateTime.isBefore(LocalDateTime.now().plusHours(72))) {
                     // Cancellation not allowed
                     return CancellationResult.CANCELLATION_NOT_ALLOWED;
                 }
