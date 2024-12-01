@@ -12,6 +12,7 @@ import java.util.UUID;
 public class Bank {
     private final String bankName;
     private Map<String, Transaction> transactionLog;
+    private static final double APPROVAL_RATE = 0.8; 
 
     public Bank(String bankName) {
         this.bankName = bankName;
@@ -21,12 +22,12 @@ public class Bank {
     public Transaction processPayment(PaymentDetails paymentDetails, double amount) {
         // First validate amount
         if (!PaymentValidation.isValidAmount(amount)) {
-            return new Transaction(generateTransactionId(), "DECLINED", amount, LocalDateTime.now());
+            return new Transaction(generateTransactionId(), "DECLINED_INVALID_AMOUNT", amount, LocalDateTime.now());
         }
 
         // Then validate payment details
         if (!validatePaymentDetails(paymentDetails)) {
-            return new Transaction(generateTransactionId(), "DECLINED", amount, LocalDateTime.now());
+            return new Transaction(generateTransactionId(), "DECLINED_INVALID_DETAILS", amount, LocalDateTime.now());
         }
 
         // Simulate bank response
@@ -68,9 +69,27 @@ public class Bank {
                PaymentValidation.isValidCVV(paymentDetails.getCvv());
     }
 
+    // private String simulateBankResponse() {
+    //     Random rand = new Random();
+    //     return rand.nextBoolean() ? "APPROVED" : "DECLINED";
+    // }
+
     private String simulateBankResponse() {
         Random rand = new Random();
-        return rand.nextBoolean() ? "APPROVED" : "DECLINED";
+        
+        // Higher chance of approval but still maintains possibility of decline
+        if (rand.nextDouble() < APPROVAL_RATE) {
+            return "APPROVED";
+        } else {
+            // Simulate different decline reasons
+            String[] declineReasons = {
+                "BANK SERVER_ERROR",
+                "PAYMENT_GATEWAY_ERROR",
+                "CARD HAS BEEN DECLINED",
+                "DECLINED_SECURITY_CODE"
+            };
+            return declineReasons[rand.nextInt(declineReasons.length)];
+        }
     }
 
     private void logTransaction(Transaction transaction) {
