@@ -273,7 +273,7 @@ public class TicketCancellationView {
                             messageText.setFill(Color.RED);
                             break;
                         case CANCELLATION_NOT_ALLOWED:
-                            messageText.setText("Cancellation not allowed within 2 hours of showtime.");
+                            messageText.setText("Cancellation not allowed within 72 hours of showtime.");
                             messageText.setFill(Color.RED);
                             break;
                         case ERROR:
