@@ -8,9 +8,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Text;
+import javafx.scene.Node;
+
 
 public class LoginView {
     private static final String DARK_BACKGROUND = "#1a1a1a";
@@ -28,49 +32,166 @@ public class LoginView {
         this.regUserLogin = new RegUserLogin();
     }
     
+    // public void show() {
+    //     VBox mainLayout = new VBox(20);
+    //     mainLayout.setStyle("-fx-background-color: " + DARK_BACKGROUND + ";");
+    //     mainLayout.setPadding(new Insets(40));
+    //     mainLayout.setAlignment(Pos.CENTER);
+
+
+
+    //     TabPane tabPane = new TabPane();
+    //     tabPane.setStyle(
+    //         "-fx-background-color: " + DARK_BACKGROUND + ";" +
+    //         "-fx-tab-min-width: 120px;" +
+    //         "-fx-tab-max-width: 120px;" +
+    //         "-fx-tab-min-height: 40px;"
+    //     );
+    
+    //     tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        
+    //     Tab loginTab = new Tab("Login", createLoginForm());
+    //     Tab signupTab = new Tab("Sign Up", createSignupForm());
+    //     loginTab.setStyle("-fx-text-fill: white;");
+    //     signupTab.setStyle("-fx-text-fill: white;");
+        
+    //     // Style the tabs
+    //     String tabStyle = 
+    //         "-fx-background-color: " + DARK_BACKGROUND + ";" +
+    //         "-fx-text-fill: white;" +
+    //         "-fx-font-size: 14px;" +
+    //         "-fx-font-weight: bold;" +
+    //         "-fx-padding: 10;";
+        
+    //     loginTab.setStyle(tabStyle);
+    //     signupTab.setStyle(tabStyle);
+
+        
+    
+        
+    //     tabPane.getTabs().addAll(loginTab, signupTab);
+    //     mainLayout.getChildren().add(tabPane);
+
+    //     Scene scene = new Scene(mainLayout, 600, 800);
+    //     loginStage.setTitle("AcmePlex - User Login");
+    //     loginStage.setScene(scene);
+    //     loginStage.show();
+    // }
+        
     public void show() {
         VBox mainLayout = new VBox(20);
         mainLayout.setStyle("-fx-background-color: " + DARK_BACKGROUND + ";");
         mainLayout.setPadding(new Insets(40));
         mainLayout.setAlignment(Pos.CENTER);
-
-        TabPane tabPane = new TabPane();
-        tabPane.setStyle(
-     
-            "-fx-tab-min-width: 120px;" +
-            "-fx-tab-max-width: 120px;" +
-            "-fx-tab-min-height: 40px;" 
-
-        );
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        
-        Tab loginTab = new Tab("Login", createLoginForm());
-        Tab signupTab = new Tab("Sign Up", createSignupForm());
-        loginTab.setStyle("-fx-text-fill: white;");
-        signupTab.setStyle("-fx-text-fill: white;");
-        
-        // Style the tabs
-        String tabStyle = 
-
-            "-fx-text-fill: white;" +
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-padding: 10;";
-        
-        loginTab.setStyle(tabStyle);
-        signupTab.setStyle(tabStyle);
-        
- 
     
-        
-        tabPane.getTabs().addAll(loginTab, signupTab);
-        mainLayout.getChildren().add(tabPane);
-
+        // Create theme buttons instead of tabs
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+    
+        Button loginButton = createThemeButton("Login");
+        Button signupButton = createThemeButton("Sign Up");
+    
+        buttonBox.getChildren().addAll(loginButton, signupButton);
+    
+        // Create a container for the forms
+        StackPane formContainer = new StackPane();
+    
+        // Create login and signup forms
+        VBox loginForm = createLoginForm();
+        ScrollPane signupForm = createSignupForm();  // Note: This returns ScrollPane
+    
+        formContainer.getChildren().addAll(loginForm, signupForm);
+    
+        // Initially show login form
+        loginForm.setVisible(true);
+        signupForm.setVisible(false);
+    
+        // Button click handlers
+        loginButton.setOnAction(e -> {
+            loginForm.setVisible(true);
+            signupForm.setVisible(false);
+            loginButton.setStyle(getSelectedButtonStyle());
+            signupButton.setStyle(getDefaultButtonStyle());
+        });
+    
+        signupButton.setOnAction(e -> {
+            loginForm.setVisible(false);
+            signupForm.setVisible(true);
+            signupButton.setStyle(getSelectedButtonStyle());
+            loginButton.setStyle(getDefaultButtonStyle());
+        });
+    
+        // Set initial button styles
+        loginButton.setStyle(getSelectedButtonStyle());
+        signupButton.setStyle(getDefaultButtonStyle());
+    
+        // Add hover effects to buttons
+        loginButton.setOnMouseEntered(e -> {
+            if (!loginForm.isVisible()) {
+                loginButton.setStyle(getHoverButtonStyle());
+            }
+        });
+        loginButton.setOnMouseExited(e -> {
+            loginButton.setStyle(loginForm.isVisible() ? getSelectedButtonStyle() : getDefaultButtonStyle());
+        });
+    
+        signupButton.setOnMouseEntered(e -> {
+            if (!signupForm.isVisible()) {
+                signupButton.setStyle(getHoverButtonStyle());
+            }
+        });
+        signupButton.setOnMouseExited(e -> {
+            signupButton.setStyle(signupForm.isVisible() ? getSelectedButtonStyle() : getDefaultButtonStyle());
+        });
+    
+        mainLayout.getChildren().addAll(buttonBox, formContainer);
+    
         Scene scene = new Scene(mainLayout, 600, 800);
         loginStage.setTitle("AcmePlex - User Login");
         loginStage.setScene(scene);
         loginStage.show();
     }
+    
+    private Button createThemeButton(String text) {
+        Button button = new Button(text);
+        button.setMinWidth(200);  // Set minimum width for buttons
+        button.setStyle(getDefaultButtonStyle());
+        return button;
+    }
+    
+    private String getDefaultButtonStyle() {
+        return "-fx-background-color: " + DARK_BACKGROUND + ";" +
+               "-fx-text-fill: #808080;" +  // Gray color for unselected
+               "-fx-font-size: 16px;" +
+               "-fx-font-weight: bold;" +
+               "-fx-padding: 10 20;" +
+               "-fx-cursor: hand;" +
+               "-fx-border-width: 0;";
+    }
+    
+    private String getSelectedButtonStyle() {
+        return "-fx-background-color: " + DARK_BACKGROUND + ";" +
+               "-fx-text-fill: white;" +  // White color for selected
+               "-fx-font-size: 16px;" +
+               "-fx-font-weight: bold;" +
+               "-fx-padding: 10 20;" +
+               "-fx-cursor: hand;" +
+               "-fx-border-width: 0 0 2 0;" +
+               "-fx-border-color: " + NETFLIX_RED + ";";
+    }
+    
+    private String getHoverButtonStyle() {
+        return "-fx-background-color: " + DARK_BACKGROUND + ";" +
+               "-fx-text-fill: white;" +  // White color on hover
+               "-fx-font-size: 16px;" +
+               "-fx-font-weight: bold;" +
+               "-fx-padding: 10 20;" +
+               "-fx-cursor: hand;" +
+               "-fx-border-width: 0;";
+    }
+    
+
 
     private VBox createLoginForm() {
         VBox loginForm = new VBox(25); // Increased spacing
@@ -126,6 +247,18 @@ public class LoginView {
             "-fx-border-width: 0;"
         );
 
+        // In createSignupForm(), modify the ScrollPane styling:
+        scrollPane.setStyle(
+ 
+            "-fx-padding: 0;" +
+            "-fx-border-width: 0;" +
+            "-fx-background-insets: 0;" +
+            "-fx-border-insets: 0;" +
+            "-fx-control-inner-background: " + DARK_BACKGROUND + ";"
+        );
+
+  
+
         VBox signupForm = new VBox(25); // Increased spacing
         signupForm.setStyle(
             "-fx-background-color: " + CARD_BACKGROUND + ";" +
@@ -148,14 +281,18 @@ public class LoginView {
         TextArea addressField = createStyledTextArea("Address");
         addressField.setStyle(
             "-fx-background-color: " + INPUT_BACKGROUND + ";" +
-            "-fx-text-fill: black;" +
+            "-fx-text-fill: white;" +
             "-fx-prompt-text-fill: #808080;" +
             "-fx-font-size: 14px;" +
             "-fx-padding: 12px;" +
             "-fx-background-radius: 4px;" +
             "-fx-border-radius: 4px;" +
             "-fx-focus-color: " + NETFLIX_RED + ";" +
-            "-fx-faint-focus-color: transparent;"
+            "-fx-faint-focus-color: transparent;" +
+            "-fx-control-inner-background: " + INPUT_BACKGROUND + ";" + // This fixes the white background
+            "-fx-text-box-border: transparent;" +
+            "-fx-background-insets: 0;" +
+            "-fx-border-color: transparent;"
         );
 
         // Payment Information
@@ -164,6 +301,40 @@ public class LoginView {
         TextField expiryYearField = createStyledTextField("YYYY");
         TextField cvvField = createStyledTextField("CVV");
         TextField cardHolderField = createStyledTextField("Card Holder Name");
+
+
+        VBox paymentCard = new VBox(10);
+        paymentCard.setStyle(
+            "-fx-background-color: " + CARD_BACKGROUND + ";" +
+            "-fx-padding: 20px;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-border-color: " + NETFLIX_RED + ";" +
+            "-fx-border-radius: 8px;" +
+            "-fx-border-width: 1px;"
+        );
+        paymentCard.setAlignment(Pos.CENTER);
+
+        Label feeLabel = new Label("Annual Membership Fee: $20.00");
+        feeLabel.setStyle(
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 18px;" +
+            "-fx-font-weight: bold;"
+        );
+
+        Label feeDescription = new Label(
+            "By signing up, you agree to pay the annual membership fee of $20.00.\n" +
+            "Benefits include:\n" +
+            "• No cancellation fees\n" +
+            "• Early access to movie bookings\n" +
+            "• Exclusive movie news and announcements"
+        );
+        feeDescription.setStyle(
+            "-fx-text-fill: #cccccc;" +
+            "-fx-font-size: 14px;"
+        );
+        feeDescription.setWrapText(true);
+
+        paymentCard.getChildren().addAll(feeLabel, feeDescription);
 
         Button signupButton = createStyledButton("Sign Up");
         Text errorText = new Text();
@@ -190,8 +361,20 @@ public class LoginView {
 
                 if (success) {
                     showAlert("Success", "Account created successfully. Please login.", Alert.AlertType.INFORMATION);
-                    TabPane tabPane = (TabPane) signupForm.getParent().getParent();
-                    tabPane.getSelectionModel().select(0);
+                    Node parent = signupForm.getParent();
+        while (parent != null && !(parent instanceof HBox)) {
+            parent = parent.getParent();
+        }
+        if (parent != null) {
+            HBox buttonBox = (HBox) parent;
+            // Find and click the login button
+            buttonBox.getChildren().stream()
+                .filter(node -> node instanceof Button && 
+                        ((Button) node).getText().equals("Login"))
+                .findFirst()
+                .ifPresent(button -> ((Button) button).fire());
+        }
+    
                 } else {
                     errorText.setText("Failed to create account. Please try again.");
                 }
@@ -229,6 +412,7 @@ public class LoginView {
         signupForm.getChildren().addAll(
             createHeader("Create New Account"),
             grid,
+            paymentCard,
             signupButton,
             errorText
         );
