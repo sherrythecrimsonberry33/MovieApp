@@ -158,6 +158,8 @@
 package backend.database;
 
 import backend.Entity.Movie;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.time.LocalDate;
