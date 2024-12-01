@@ -1,13 +1,21 @@
 package backend.Entity.receipt;
-
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import backend.Entity.TicketInfo;
-
 import java.util.stream.Collectors;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import java.io.File;
+import java.io.IOException;
+
+
+
+
 
 
 public class SendEmail {
@@ -111,4 +119,133 @@ public class SendEmail {
 
         Transport.send(message);
     }
+
+    public void sendAnnualFeeInvoice(String recipientEmail, String firstName, String lastName, String address) throws MessagingException {
+        try {
+            // Generate PDF invoice
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Document document = new Document(PageSize.A4);
+            PdfWriter.getInstance(document, outputStream);
+            
+            document.open();
+            
+            // Add logo using relative path from assets
+        try {
+            String logoPath = "MovieReservationApp" + File.separator + "assets" + File.separator + "AcmePlex.png";
+            Image logo = Image.getInstance(logoPath);
+            logo.scaleToFit(100, 100);
+            logo.setAlignment(Element.ALIGN_RIGHT);
+            document.add(logo);
+        } catch (IOException | DocumentException e) {
+            System.err.println("Error loading logo: " + e.getMessage());
+        }
+
+            // Add company name
+            document.add(new Paragraph("AcmePlex Theaters"));
+            document.add(new Paragraph("123 Main Street"));
+            
+
+            document.add(Chunk.NEWLINE);
+
+            // Add invoice header
+      
+            document.add(new Paragraph("INVOICE"));
+            document.add(Chunk.NEWLINE);
+
+            // Add invoice details
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+            String currentDate = LocalDateTime.now().format(formatter);
+
+            document.add(new Paragraph("Date: " + currentDate));
+            document.add(new Paragraph("Invoice #: AF-" + System.currentTimeMillis()));
+            document.add(Chunk.NEWLINE);
+
+            // Add customer details
+            document.add(new Paragraph("Bill To:"));
+            document.add(new Paragraph(firstName + " " + lastName));
+            document.add(new Paragraph(address));
+            document.add(Chunk.NEWLINE);
+            
+            // Create table for invoice items
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            
+            // Add table headers
+            table.addCell("Description");
+            table.addCell("Quantity");
+            table.addCell("Unit Price");
+            table.addCell("Total");
+            
+            // Add invoice item
+            table.addCell("Annual Membership Fee");
+            table.addCell("1");
+            table.addCell("$20.00");
+            table.addCell("$20.00");
+            
+            document.add(table);
+            document.add(Chunk.NEWLINE);
+            
+            // Add total
+            Paragraph total = new Paragraph("Total Amount: $20.00");
+            total.setAlignment(Element.ALIGN_RIGHT);
+            document.add(total);
+            
+            // Add footer
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("Thank you for becoming a registered member!"));
+            document.close();
+            
+            // Send email with PDF attachment
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", SMTP_HOST);
+            props.put("mail.smtp.port", SMTP_PORT);
+            
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
+                }
+            });
+            
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(SENDER_EMAIL, "AcmePlex Cinema"));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+            message.setSubject("AcmePlex Annual Membership Fee Invoice");
+            
+            // Create multipart message
+            Multipart multipart = new MimeMultipart();
+            
+            // Add text part
+            BodyPart textPart = new MimeBodyPart();
+            textPart.setContent(
+                "Dear " + firstName + ",<br><br>" +
+                "Thank you for becoming a registered member of AcmePlex Theaters! " +
+                "Please find attached your invoice for the annual membership fee.<br><br>" +
+                "Best regards,<br>" +
+                "AcmePlex Theaters", 
+                "text/html"
+            );
+            multipart.addBodyPart(textPart);
+            
+            // Add PDF attachment
+            BodyPart pdfPart = new MimeBodyPart();
+            pdfPart.setContent(outputStream.toByteArray(), "application/pdf");
+            pdfPart.setFileName("AcmePlex_Annual_Fee_Invoice.pdf");
+            multipart.addBodyPart(pdfPart);
+            
+            message.setContent(multipart);
+            Transport.send(message);
+            
+        } catch (Exception e) {
+            e.printStackTrace(); // Print the full stack trace
+            System.err.println("Detailed error while sending invoice: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Caused by: " + e.getCause().getMessage());
+            }
+            throw new MessagingException("Failed to generate and send invoice: " + e.getMessage(), e);
+        }
+    }
+
 }
