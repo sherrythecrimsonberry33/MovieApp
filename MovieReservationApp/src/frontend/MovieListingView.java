@@ -311,6 +311,7 @@ import javafx.concurrent.Task;
 import javafx.scene.effect.DropShadow;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MovieListingView extends Application {
     private MovieDAO movieDAO;
@@ -432,8 +433,87 @@ public class MovieListingView extends Application {
 
     private void handleCancelTicket() {
         // Open the TicketCancellationView
-        TicketCancellationView cancellationView = new TicketCancellationView();
+        TicketCancellationView cancellationView = new TicketCancellationView(loggedInUser);
         cancellationView.show();
+    }
+
+    private TextField searchField;
+    private ComboBox<String> ratingsFilter;
+    
+    private HBox createSearchSection() {
+        HBox searchSection = new HBox(20);
+        searchSection.setAlignment(Pos.CENTER);
+        searchSection.setPadding(new Insets(0, 0, 20, 0));
+    
+        // Search field
+        searchField = new TextField();  // Using class field
+        searchField.setPromptText("Search movies...");
+        searchField.setPrefWidth(300);
+        searchField.setStyle(
+            "-fx-background-color: #3a3a3a;" +
+            "-fx-text-fill: white;" +
+            "-fx-prompt-text-fill: #808080;" +
+            "-fx-padding: 10px;" +
+            "-fx-background-radius: 20px;"
+        );
+    
+        // Ratings filter combo box
+        ratingsFilter = new ComboBox<>();  // Using class field
+        ratingsFilter.getItems().addAll(
+            "All Ratings",
+            "Rating: 10",
+            "Rating: 9+",
+            "Rating: 8+",
+            "Rating: 7+",
+            "Rating: 6+",
+            "Rating: 5+",
+            "Rating: 4+",
+            "Rating: 3+",
+            "Rating: 2+",
+            "Rating: 1+"
+        );
+        ratingsFilter.setValue("All Ratings");
+        ratingsFilter.setStyle(
+            // "-fx-background-color: #3a3a3a;" +
+            "-fx-text-fill: white;" +
+            "-fx-prompt-text-fill: white;" +
+            "-fx-background-radius: 20px;"
+        );
+    
+        // Add search functionality
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterMovies(newValue, ratingsFilter.getValue());
+        });
+    
+        ratingsFilter.setOnAction(e -> {
+            filterMovies(searchField.getText(), ratingsFilter.getValue());
+        });
+    
+        searchSection.getChildren().addAll(searchField, ratingsFilter);
+        return searchSection;
+    }
+    
+    private void filterMovies(String searchText, String ratingFilter) {
+        if (cachedMovies == null) return;
+    
+        List<Movie> filteredMovies = cachedMovies.stream()
+            .filter(movie -> {
+                // Title filter
+                boolean matchesSearch = searchText == null || searchText.isEmpty() ||
+                    movie.getTitle().toLowerCase().contains(searchText.toLowerCase());
+    
+                // Rating filter
+                boolean matchesRating = true;
+                if (!ratingFilter.equals("All Ratings")) {
+                    int requiredRating = Integer.parseInt(ratingFilter.replaceAll("[^0-9]", ""));
+                    matchesRating = movie.getRating() >= requiredRating;
+                }
+    
+                return matchesSearch && matchesRating;
+            })
+            .collect(Collectors.toList());
+    
+        displayMoviesOnly(filteredMovies);  // New method to display only movies without recreating search
     }
 
     public void showMovieList() {
@@ -484,17 +564,49 @@ public class MovieListingView extends Application {
         new Thread(loadMoviesTask).start();
     }
 
-    private void displayMovies(List<Movie> movies) {
-        contentContainer.getChildren().clear();
+    private void displayMoviesOnly(List<Movie> movies) {
+        // Remove only the movie grid if it exists
+        contentContainer.getChildren().removeIf(node -> node instanceof FlowPane);
+    
         FlowPane movieGrid = new FlowPane(20, 20);
         movieGrid.setAlignment(Pos.CENTER);
-
+    
         for (Movie movie : movies) {
             movieGrid.getChildren().add(createMovieCard(movie));
         }
-
+    
         contentContainer.getChildren().add(movieGrid);
     }
+    
+    // Update original displayMovies method
+    private void displayMovies(List<Movie> movies) {
+        contentContainer.getChildren().clear();
+        contentContainer.getChildren().add(createSearchSection());
+    
+        FlowPane movieGrid = new FlowPane(20, 20);
+        movieGrid.setAlignment(Pos.CENTER);
+    
+        for (Movie movie : movies) {
+            movieGrid.getChildren().add(createMovieCard(movie));
+        }
+    
+        contentContainer.getChildren().add(movieGrid);
+    }
+
+    // private void displayMovies(List<Movie> movies) {
+    //     contentContainer.getChildren().clear();
+    
+    //     contentContainer.getChildren().add(createSearchSection());
+
+    //     FlowPane movieGrid = new FlowPane(20, 20);
+    //     movieGrid.setAlignment(Pos.CENTER);
+
+    //     for (Movie movie : movies) {
+    //         movieGrid.getChildren().add(createMovieCard(movie));
+    //     }
+
+    //     contentContainer.getChildren().add(movieGrid);
+    // }
 
     private VBox createMovieCard(Movie movie) {
         VBox card = new VBox(10);
