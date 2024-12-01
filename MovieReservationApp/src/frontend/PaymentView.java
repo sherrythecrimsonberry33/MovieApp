@@ -263,14 +263,15 @@ public class PaymentView {
                 TicketInfo ticketInfo = new TicketInfo(
                     movieTiming, selectedSeats, totalAmount, userEmail, transaction);
                 
+                double pricePerSeat = movieTiming.getTicketPrice();
                 // Book seats with ticket ID
                 boolean seatsBooked = seatBookingDAO.bookSeats(
-                    movieTiming.getId(), selectedSeats, ticketInfo.getTicketId());
+                    movieTiming.getId(), selectedSeats, ticketInfo.getTicketId(), pricePerSeat);
                 
                 if (seatsBooked) {
                     // Generate receipt and send email
                     GenerateReceipt receipt = new GenerateReceipt(
-                        ticketInfo, movieTiming.getTicketPrice(), 
+                        ticketInfo, pricePerSeat, 
                         TheatreInfo.getInstance());
                     
                     SendEmail emailSender = new SendEmail();
@@ -329,6 +330,12 @@ public class PaymentView {
         
         if (cardHolderField.getText().isEmpty()) {
             showError("Please enter card holder name.");
+            return false;
+        }
+
+        if (userType.equals("Guest") && (emailField.getText().isEmpty() || 
+            !emailField.getText().matches("^[A-Za-z0-9+_.-]+@(.+)$"))) {
+            showError("Please enter a valid email address.");
             return false;
         }
         

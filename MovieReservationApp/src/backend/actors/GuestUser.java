@@ -4,7 +4,7 @@ import backend.Entity.Transaction;
 import java.time.LocalDateTime;
 
 public class GuestUser extends User {
-    private static final double CANCELLATION_FEE_PERCENTAGE = 0.15; // 15% cancellation fee
+    public static final double CANCELLATION_FEE_PERCENTAGE = 0.15; // 15% cancellation fee
     
     public GuestUser(String email) {
         super(email);

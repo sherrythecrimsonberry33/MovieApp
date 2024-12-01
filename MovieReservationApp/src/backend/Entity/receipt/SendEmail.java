@@ -88,10 +88,45 @@ public class SendEmail {
     }
 
     
-    public void sendCancellationEmail(String recipientEmail) throws MessagingException {
+    // public void sendCancellationEmail(String recipientEmail) throws MessagingException {
+    //     Properties props = new Properties();
+    //     props.put("mail.smtp.auth", "true");
+    //     props.put("mail.smtp.starttls.enable", "true"); // Enable STARTTLS
+    //     props.put("mail.smtp.host", SMTP_HOST);
+    //     props.put("mail.smtp.port", SMTP_PORT);
+
+    //     Session session = Session.getInstance(props, new Authenticator() {
+    //         @Override
+    //         protected PasswordAuthentication getPasswordAuthentication() {
+    //             return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASSWORD);
+    //         }
+    //     });
+
+    //     Message message = new MimeMessage(session);
+    //     message.setFrom(new InternetAddress(SENDER_EMAIL));
+    //     message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+    //     message.setSubject("Your AcmePlex Ticket Cancellation");
+
+    //     String emailContent = "<html><body style='font-family: Arial, sans-serif;'>" +
+    //                           "<h2>Ticket Cancellation Confirmation</h2>" +
+    //                           "<p>Dear Customer,</p>" +
+    //                           "<p>Your ticket has been successfully canceled.</p>" +
+    //                           "<p>If you have any questions or need further assistance, please contact our support team.</p>" +
+    //                           "<br><p>Thank you for choosing AcmePlex Theaters!</p>" +
+    //                           "</body></html>";
+
+    //     message.setContent(emailContent, "text/html");
+
+    //     Transport.send(message);
+    // }
+
+
+    public void sendCancellationEmailWithRefund(String recipientEmail, String ticketId, 
+                                              double totalAmount, double refundAmount, 
+                                              boolean isRegisteredUser) throws MessagingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // Enable STARTTLS
+        props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", SMTP_HOST);
         props.put("mail.smtp.port", SMTP_PORT);
 
@@ -105,20 +140,51 @@ public class SendEmail {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(SENDER_EMAIL));
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
-        message.setSubject("Your AcmePlex Ticket Cancellation");
+        message.setSubject("Your AcmePlex Ticket Cancellation - Refund Details");
 
-        String emailContent = "<html><body style='font-family: Arial, sans-serif;'>" +
-                              "<h2>Ticket Cancellation Confirmation</h2>" +
-                              "<p>Dear Customer,</p>" +
-                              "<p>Your ticket has been successfully canceled.</p>" +
-                              "<p>If you have any questions or need further assistance, please contact our support team.</p>" +
-                              "<br><p>Thank you for choosing AcmePlex Theaters!</p>" +
-                              "</body></html>";
+        String refundSection = isRegisteredUser ? 
+            String.format(
+                "<div style='margin: 20px 0; padding: 15px; background-color: #f8f8f8; border-radius: 5px;'>" +
+                "<h3 style='color: #28a745; margin-bottom: 10px;'>Refund Details</h3>" +
+                "<p>Original Amount: $%.2f</p>" +
+                "<p><strong>Full Refund Amount: $%.2f</strong></p>" +
+                "<p style='color: #28a745;'><em>As a registered user, no cancellation fee applies.</em></p>" +
+                "</div>",
+                totalAmount, refundAmount
+            ) :
+            String.format(
+                "<div style='margin: 20px 0; padding: 15px; background-color: #f8f8f8; border-radius: 5px;'>" +
+                "<h3 style='color: #28a745; margin-bottom: 10px;'>Refund Details</h3>" +
+                "<p>Original Amount: $%.2f</p>" +
+                "<p>Cancellation Fee (15%%): $%.2f</p>" +
+                "<p><strong>Refund Amount: $%.2f</strong></p>" +
+                "</div>",
+                totalAmount,
+                totalAmount * 0.15,
+                refundAmount
+            );
+
+        String emailContent = String.format(
+            "<html>" +
+            "<body style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>" +
+            "<h2 style='color: #e50914;'>Ticket Cancellation Confirmation</h2>" +
+            "<p>Dear Customer,</p>" +
+            "<p>Your ticket <strong>%s</strong> has been successfully canceled.</p>" +
+            "%s" + // refund section
+            "<p>The refund will be processed to your original payment method within 3-5 business days.</p>" +
+            "<hr style='margin: 20px 0; border: none; border-top: 1px solid #eee;'>" +
+            "<p>If you have any questions about your refund, please contact our support team.</p>" +
+            "<p style='color: #666;'><em>Thank you for choosing AcmePlex Theaters!</em></p>" +
+            "</body>" +
+            "</html>",
+            ticketId,
+            refundSection
+        );
 
         message.setContent(emailContent, "text/html");
-
         Transport.send(message);
     }
+
 
     public void sendAnnualFeeInvoice(String recipientEmail, String firstName, String lastName, String address) throws MessagingException {
         try {
