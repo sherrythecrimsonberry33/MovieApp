@@ -1,6 +1,6 @@
 package backend.Entity;
 
-
+import backend.Entity.receipt.SendEmail;
 import backend.actors.RegisteredUser;
 import backend.database.DatabaseConnection;
 import java.security.MessageDigest;
@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Base64;
+
+import javax.mail.MessagingException;
 
 public class RegUserLogin {
     private static final String LOGIN_QUERY = 
@@ -99,7 +101,19 @@ public class RegUserLogin {
             ps.setString(11, paymentDetails.getCvv());
             ps.setString(12, paymentDetails.getCardHolderName());
             
-            return ps.executeUpdate() > 0;
+            if (ps.executeUpdate() > 0) {
+            // Send annual fee invoice
+            try {
+                SendEmail emailSender = new SendEmail();
+                emailSender.sendAnnualFeeInvoice(email, firstName, lastName, address);
+            } catch (MessagingException e) {
+                // Log error but don't fail the signup
+                System.err.println("Failed to send annual fee invoice: " + e.getMessage());
+            }
+            return true;
+        }
+        
+        return false;
             
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) { // Duplicate key error

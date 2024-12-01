@@ -1,6 +1,5 @@
 package frontend;
 
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,8 +50,11 @@ public class MainEntryView extends Application {
         content.getChildren().addAll(guestButton, registeredUserButton);
         mainLayout.setCenter(content);
 
-        Scene scene = new Scene(mainLayout, 800, 600);
+        Scene scene = new Scene(mainLayout);
         primaryStage.setScene(scene);
+
+        // Enable full-screen mode
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 

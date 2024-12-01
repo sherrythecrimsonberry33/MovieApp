@@ -1,9 +1,8 @@
 package backend.database;
 
-
+import backend.Entity.Movie;
 import java.sql.*;
 import java.util.*;
-import backend.Entity.Movie;
 
 public class MovieDAO {
     private static final String SELECT_ALL_MOVIES = "SELECT * FROM movies";
@@ -58,31 +57,16 @@ public class MovieDAO {
                 ps.setInt(8, movie.getId());
             }
             
-            ps.executeUpdate();
-            
-            // Only for new movies
-            if (movie.getId() == null) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        // Create a new Movie instance with the generated ID since Movie is immutable
-                        Movie updatedMovie = new Movie(
-                            rs.getInt(1),
-                            movie.getTitle(),
-                            movie.getPosterUrl(),
-                            movie.getGenre(),
-                            movie.getSynopsis(),
-                            movie.getRating(),
-                            movie.getAgeRating(),
-                            movie.getDuration()
-                        );
-                        // You might want to assign this updated movie back to wherever it's being used
-                    }
+                    ps.executeUpdate();
+                } catch (SQLException e) {
+                    throw new RuntimeException("Error saving movie", e);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error saving movie", e);
-        }
-    }
+
+            
+            
+    
+    
 
     public void deleteMovie(Integer id) {
         try (Connection conn = DatabaseConnection.getInstance().getConnection();

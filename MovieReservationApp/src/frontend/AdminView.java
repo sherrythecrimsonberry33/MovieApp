@@ -1,13 +1,11 @@
 package frontend;
 
-
 import backend.Entity.Movie;
 import backend.database.AdminDAO;
 import backend.database.MovieDAO;
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
 
 public class AdminView extends JFrame {
     private AdminDAO adminDAO;

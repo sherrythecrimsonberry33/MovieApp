@@ -1,139 +1,90 @@
-// package backend.database;
+// // package backend.database;
 
+// // import backend.Entity.*;
+// // import java.sql.*;
+// // import java.util.ArrayList;
+// // import java.util.List;
 
-// import backend.Entity.*;
+// // public class MovieTimingsDAO {
+// //     private DatabaseConnection dbConnection;
+// //     private MovieDAO movieDAO;
 
-// import java.sql.*;
-// import java.time.LocalDateTime;
-// import java.util.ArrayList;
-// import java.util.List;
+// //     public MovieTimingsDAO() {
+// //         this.dbConnection = DatabaseConnection.getInstance();
+// //         this.movieDAO = new MovieDAO();
+// //     }
 
-// public class MovieTimingsDAO {
-//     private DatabaseConnection dbConnection;
-//     private MovieDAO movieDAO;  // Assuming you have this
-
-//     public MovieTimingsDAO() {
-//         this.dbConnection = DatabaseConnection.getInstance();
-//         this.movieDAO = new MovieDAO();
-//     }
-
-//     public List<MovieTimings> getAvailableTimingsForMovie(int movieId) {
-//         List<MovieTimings> timings = new ArrayList<>();
-//         LocalDateTime currentTime = LocalDateTime.now();
+// //     public List<MovieTimings> getAvailableTimingsForMovie(int movieId) {
+// //         System.out.println("=== MovieTimingsDAO Debug ===");
+// //         System.out.println("Querying for Movie ID: " + movieId);
         
-//         String query = "SELECT * FROM movie_timings WHERE movie_id = ? " +
-//                       "AND show_datetime > ? AND DATE(show_datetime) = CURDATE() " +
-//                       "ORDER BY show_datetime";
+// //         List<MovieTimings> timings = new ArrayList<>();
         
-//         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(query)) {
-//             pstmt.setInt(1, movieId);
-//             pstmt.setTimestamp(2, Timestamp.valueOf(currentTime));
+// //         // First get the movie object
+// //         Movie movie = movieDAO.getMovieById(movieId);
+// //         if (movie == null) {
+// //             System.err.println("Movie not found for ID: " + movieId);
+// //             return timings;
+// //         }
+
+// //         String query = "SELECT * FROM movie_timings WHERE movie_id = ?";
+        
+// //         try (Connection conn = dbConnection.getConnection();
+// //              PreparedStatement pstmt = conn.prepareStatement(query)) {
             
-//             ResultSet rs = pstmt.executeQuery();
-//             while (rs.next()) {
-//                 Movie movie = movieDAO.getMovieById(rs.getInt("movie_id"));
-//                 MovieHall hall = new MovieHall(MovieHallName.valueOf(rs.getString("hall_name")));
-                
-//                 // Create MovieTimings object using the constructor that matches your class
-//                 MovieTimings timing = new MovieTimings(
-//                     rs.getInt("id"),
-//                     movie,
-//                     hall,
-//                     rs.getTimestamp("show_datetime").toLocalDateTime(),
-//                     rs.getDouble("price")
-//                 );
-                
-//                 timings.add(timing);
-//             }
-//         } catch (SQLException e) {
-//             System.err.println("Error getting available timings: " + e.getMessage());
-//             e.printStackTrace();
-//         }
-//         return timings;
-//     }
-
-//     public MovieTimings getTimingById(int timingId) {
-//         String query = "SELECT * FROM movie_timings WHERE id = ?";
-//         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(query)) {
-//             pstmt.setInt(1, timingId);
-//             ResultSet rs = pstmt.executeQuery();
+// //             pstmt.setInt(1, movieId);
+// //             System.out.println("Executing query: " + pstmt.toString());
             
-//             if (rs.next()) {
-//                 Movie movie = movieDAO.getMovieById(rs.getInt("movie_id"));
-//                 MovieHall hall = new MovieHall(MovieHallName.valueOf(rs.getString("hall_name")));
-                
-//                 return new MovieTimings(
-//                     rs.getInt("id"),
-//                     movie,
-//                     hall,
-//                     rs.getTimestamp("show_datetime").toLocalDateTime(),
-//                     rs.getDouble("price")
-//                 );
-//             }
-//         } catch (SQLException e) {
-//             System.err.println("Error getting timing by ID: " + e.getMessage());
-//             e.printStackTrace();
-//         }
-//         return null;
-//     }
+// //             try (ResultSet rs = pstmt.executeQuery()) {
+// //                 while (rs.next()) {
+// //                     try {
+// //                         int id = rs.getInt("id");
+// //                         String hallName = rs.getString("hall_name");
+// //                         Timestamp showTime = rs.getTimestamp("show_time");
+// //                         double price = rs.getDouble("price");
+                        
+// //                         System.out.println(String.format(
+// //                             "Row Data - ID: %d, Hall: %s, DateTime: %s, Price: %.2f",
+// //                             id, hallName, showTime, price
+// //                         ));
 
-//     // Additional utility method to check if a timing exists and is available
-//     public boolean isTimingAvailable(int timingId) {
-//         String query = "SELECT show_datetime FROM movie_timings WHERE id = ? " +
-//                       "AND show_datetime > NOW() AND DATE(show_datetime) = CURDATE()";
-                      
-//         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(query)) {
-//             pstmt.setInt(1, timingId);
-//             ResultSet rs = pstmt.executeQuery();
-//             return rs.next(); // Returns true if timing exists and is available
-//         } catch (SQLException e) {
-//             System.err.println("Error checking timing availability: " + e.getMessage());
-//             e.printStackTrace();
-//             return false;
-//         }
-//     }
+// //                         MovieHall hall = new MovieHall(MovieHallName.valueOf(hallName));
+// //                         MovieTimings timing = new MovieTimings(
+// //                             id,
+// //                             movie,
+// //                             hall,
+// //                             showTime.toLocalTime(),
+// //                             price
+// //                         );
 
-//     // Method to get all available timings for the current day (might be useful for admin view)
-//     public List<MovieTimings> getAllAvailableTimingsForToday() {
-//         List<MovieTimings> timings = new ArrayList<>();
-//         LocalDateTime currentTime = LocalDateTime.now();
+// //                         if (timing.getShowTime().isAfter(java.time.LocalDateTime.now())) {
+// //                             timings.add(timing);
+// //                             System.out.println("Successfully created timing object");
+// //                         }
+                        
+// //                     } catch (Exception e) {
+// //                         System.err.println("Error creating timing object: " + e.getMessage());
+// //                         e.printStackTrace();
+// //                     }
+// //                 }
+// //             }
+// //         } catch (SQLException e) {
+// //             System.err.println("Database error: " + e.getMessage());
+// //             e.printStackTrace();
+// //         }
         
-//         String query = "SELECT * FROM movie_timings " +
-//                       "WHERE show_datetime > ? AND DATE(show_datetime) = CURDATE() " +
-//                       "ORDER BY show_datetime";
-        
-//         try (PreparedStatement pstmt = dbConnection.getConnection().prepareStatement(query)) {
-//             pstmt.setTimestamp(1, Timestamp.valueOf(currentTime));
-            
-//             ResultSet rs = pstmt.executeQuery();
-//             while (rs.next()) {
-//                 Movie movie = movieDAO.getMovieById(rs.getInt("movie_id"));
-//                 MovieHall hall = new MovieHall(MovieHallName.valueOf(rs.getString("hall_name")));
-                
-//                 MovieTimings timing = new MovieTimings(
-//                     rs.getInt("id"),
-//                     movie,
-//                     hall,
-//                     rs.getTimestamp("show_datetime").toLocalDateTime(),
-//                     rs.getDouble("price")
-//                 );
-                
-//                 timings.add(timing);
-//             }
-//         } catch (SQLException e) {
-//             System.err.println("Error getting all available timings: " + e.getMessage());
-//             e.printStackTrace();
-//         }
-//         return timings;
-//     }
-// }
-
-
+// //         System.out.println("Returning " + timings.size() + " timings");
+// //         return timings;
+// //     }
+// // }
 
 package backend.database;
 
 import backend.Entity.*;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,9 +97,9 @@ public class MovieTimingsDAO {
         this.movieDAO = new MovieDAO();
     }
 
-    public List<MovieTimings> getAvailableTimingsForMovie(int movieId) {
+    public List<MovieTimings> getAvailableTimingsForMovie(int movieId, LocalDate showDate) {
         System.out.println("=== MovieTimingsDAO Debug ===");
-        System.out.println("Querying for Movie ID: " + movieId);
+        System.out.println("Querying for Movie ID: " + movieId + " on Date: " + showDate);
         
         List<MovieTimings> timings = new ArrayList<>();
         
@@ -159,12 +110,13 @@ public class MovieTimingsDAO {
             return timings;
         }
 
-        String query = "SELECT * FROM movie_timings WHERE movie_id = ?";
+        String query = "SELECT * FROM movie_timings WHERE movie_id = ? AND show_date = ? AND (show_date > CURDATE() OR (show_date = CURDATE() AND show_time >= CURTIME())) ORDER BY show_time";
         
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             
             pstmt.setInt(1, movieId);
+            pstmt.setDate(2, Date.valueOf(showDate));
             System.out.println("Executing query: " + pstmt.toString());
             
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -172,25 +124,37 @@ public class MovieTimingsDAO {
                     try {
                         int id = rs.getInt("id");
                         String hallName = rs.getString("hall_name");
-                        Timestamp showTime = rs.getTimestamp("show_datetime");
+                        Date showDateSql = rs.getDate("show_date");
+                        Time showTimeSql = rs.getTime("show_time");
                         double price = rs.getDouble("price");
                         
                         System.out.println(String.format(
-                            "Row Data - ID: %d, Hall: %s, DateTime: %s, Price: %.2f",
-                            id, hallName, showTime, price
+                            "Row Data - ID: %d, Hall: %s, Date: %s, Time: %s, Price: %.2f",
+                            id, hallName, showDateSql, showTimeSql, price
                         ));
+
+                        // Convert SQL Date and Time to Java LocalDate and LocalTime
+                        LocalDate localShowDate = showDateSql.toLocalDate();
+                        LocalTime localShowTime = showTimeSql.toLocalTime();
 
                         MovieHall hall = new MovieHall(MovieHallName.valueOf(hallName));
                         MovieTimings timing = new MovieTimings(
                             id,
                             movie,
                             hall,
-                            showTime.toLocalDateTime(),
+                            localShowDate,
+                            localShowTime,
                             price
                         );
-                        
-                        timings.add(timing);
-                        System.out.println("Successfully created timing object");
+
+                        // Combine showDate and showTime to LocalDateTime for comparison
+                        LocalDateTime showDateTime = LocalDateTime.of(localShowDate, localShowTime);
+
+                        // Check if the show time is after the current time
+                        if (showDateTime.isAfter(LocalDateTime.now())) {
+                            timings.add(timing);
+                            System.out.println("Successfully created timing object");
+                        }
                         
                     } catch (Exception e) {
                         System.err.println("Error creating timing object: " + e.getMessage());
@@ -205,5 +169,27 @@ public class MovieTimingsDAO {
         
         System.out.println("Returning " + timings.size() + " timings");
         return timings;
+    }
+
+    public List<LocalDate> getAvailableDatesForMovie(int movieId) {
+        List<LocalDate> dates = new ArrayList<>();
+        String query = "SELECT DISTINCT show_date FROM movie_timings WHERE movie_id = ? AND show_date >= CURDATE() ORDER BY show_date";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            
+            pstmt.setInt(1, movieId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Date date = rs.getDate("show_date");
+                    dates.add(date.toLocalDate());
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return dates;
     }
 }
