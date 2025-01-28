@@ -29,8 +29,8 @@ import java.sql.Statement;
 public class SendEmail {
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String SENDER_EMAIL = "alexxcarter92@gmail.com";
-    private static final String SENDER_PASSWORD = "kcaoagymqzbuplkb";
+    private static final String SENDER_EMAIL = "youremail@something.com";
+    private static final String SENDER_PASSWORD = "SAMPLE";
 
     public void sendTicketAndReceipt(String recipientEmail, TicketInfo ticketInfo, GenerateReceipt receipt) 
             throws MessagingException {
