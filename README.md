@@ -2,6 +2,34 @@
 
 A comprehensive movie theater ticket reservation system built with Java and JavaFX, featuring both user and admin interfaces for managing movie bookings, user accounts, and theater operations.
 
+
+## Screenshots from the GUI
+
+![Screenshot](MovieReservationApp/assets/ac1.png)
+*The movies populated in the main GUI*
+
+![Screenshot](MovieReservationApp/assets/ac2.png)
+*The movie shotime being fetched*
+![Screenshot](MovieReservationApp/assets/ac3.png)
+*Interactive Seat Map GUI*
+![Screenshot](MovieReservationApp/assets/ac4.png)
+*Bank Payment Gateway*
+
+
+![Screenshot](MovieReservationApp/assets/ac5.png)
+*Ticket Cancellation Refund*
+
+![Screenshot](MovieReservationApp/assets/ac6.png)
+*Membership Signup*
+
+
+![Screenshot](MovieReservationApp/assets/ac7.png)
+*PDF email invoice*
+
+
+![Screenshot](MovieReservationApp/assets/ac8.png)
+
+
 ## 📋 Table of Contents
 - [Features](#features)
 - [Technology Stack](#technology-stack)
